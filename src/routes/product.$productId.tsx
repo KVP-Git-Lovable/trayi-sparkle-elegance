@@ -44,7 +44,7 @@ export const Route = createFileRoute("/product/$productId")({
 });
 
 function ProductPage() {
-  const { product } = Route.useLoaderData();
+  const { product } = Route.useLoaderData() as { product: import("@/lib/catalog").Product };
   const navigate = useNavigate();
   const { add } = useCart();
 
