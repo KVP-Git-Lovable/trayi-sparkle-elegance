@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Search, User, ShoppingBag, Menu } from "lucide-react";
 import { useState } from "react";
+import { useCart } from "@/lib/cart";
 
 const nav = [
   { to: "/collections", label: "Collections" },
@@ -12,6 +13,7 @@ const nav = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const { count } = useCart();
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
@@ -43,7 +45,7 @@ export function SiteHeader() {
           <Link to="/cart" aria-label="Cart" className="relative hover:text-accent transition-colors">
             <ShoppingBag className="h-5 w-5" />
             <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-medium text-accent-foreground">
-              0
+              {count}
             </span>
           </Link>
         </div>
