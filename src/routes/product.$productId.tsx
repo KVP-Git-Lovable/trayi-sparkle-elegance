@@ -82,25 +82,7 @@ function ProductPage() {
       {/* Product */}
       <section className="mx-auto max-w-7xl px-6 py-12 grid gap-12 md:grid-cols-2">
         {/* Gallery */}
-        <div>
-          <div className="aspect-square overflow-hidden bg-secondary/40">
-            <img src={activeImg} alt={product.name} className="h-full w-full object-cover" />
-          </div>
-          <div className="mt-4 grid grid-cols-5 gap-2">
-            {product.gallery.map((g, i) => (
-              <button
-                key={i}
-                onClick={() => setActiveImg(g)}
-                className={`aspect-square overflow-hidden bg-secondary/40 border ${
-                  activeImg === g ? "border-accent" : "border-transparent"
-                }`}
-                aria-label={`View image ${i + 1}`}
-              >
-                <img src={g} alt="" className="h-full w-full object-cover" />
-              </button>
-            ))}
-          </div>
-        </div>
+        <ProductGallery images={product.gallery.length ? product.gallery : [product.image]} alt={product.name} />
 
         {/* Info */}
         <div>
