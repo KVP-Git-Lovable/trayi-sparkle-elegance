@@ -3,6 +3,7 @@ import { useState } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
+import { ProductGallery } from "@/components/product-gallery";
 import { formatINR, getProduct, products } from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
 import { ShieldCheck, Award, Truck, Store, Minus, Plus, Heart, Share2 } from "lucide-react";
