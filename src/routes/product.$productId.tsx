@@ -49,7 +49,6 @@ function ProductPage() {
   const navigate = useNavigate();
   const { add } = useCart();
 
-  const [activeImg, setActiveImg] = useState(product.gallery[0] ?? product.image);
   const [purity, setPurity] = useState(product.purityOptions[0]);
   const [metal, setMetal] = useState(product.metalOptions[0]);
   const [size, setSize] = useState(product.sizes?.[0]);
