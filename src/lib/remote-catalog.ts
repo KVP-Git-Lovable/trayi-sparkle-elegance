@@ -82,7 +82,26 @@ function mapRow(row: CatalogRow): Product {
     ["14 KT", "18 KT"];
   const sizes = pickOption(row.options, ["Size", "Ring Size", "Length"]);
 
-  const firstVariant = (row.variants ?? [])[0] as
+  const rawVariants = (row.variants ?? []) as Array<Record<string, unknown>>;
+  const variants = rawVariants.map((v) => ({
+    size: v.size != null ? String(v.size) : undefined,
+    color: v.color != null ? String(v.color) : undefined,
+    purity: v.purity != null ? String(v.purity) : undefined,
+    price: Number(v.price) || 0,
+    mrp:
+      v.compare_at_price != null && Number(v.compare_at_price) > 0
+        ? Number(v.compare_at_price)
+        : undefined,
+    sku: String(
+      (v.sku as string | undefined) ??
+        (v.variant_id as string | number | undefined) ??
+        (v.id as string | number | undefined) ??
+        row.handle ??
+        row.id,
+    ),
+  }));
+
+  const firstVariant = rawVariants[0] as
     | { sku?: string; variant_id?: string | number; id?: string | number }
     | undefined;
   const sku =
@@ -93,9 +112,12 @@ function mapRow(row: CatalogRow): Product {
       row.id);
 
   const image = row.image_url ?? "";
+  const variantPrices = variants.map((v) => v.price).filter((p) => p > 0);
+  const minVariantPrice = variantPrices.length ? Math.min(...variantPrices) : 0;
   const price =
-    row.base_price ??
-    Number((row.display_price ?? "").replace(/[^\d.]/g, "")) ??
+    minVariantPrice ||
+    row.base_price ||
+    Number((row.display_price ?? "").replace(/[^\d.]/g, "")) ||
     0;
   const mrp = row.compare_at_price ?? undefined;
 
@@ -117,8 +139,10 @@ function mapRow(row: CatalogRow): Product {
     sku,
     weightGm: 0,
     diamondCt: 0,
+    variants: variants.length ? variants : undefined,
   };
 }
+
 
 export async function fetchProductsByCategory(slug: string): Promise<Product[]> {
   const { data, error } = await posSupabase
