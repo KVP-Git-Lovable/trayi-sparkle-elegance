@@ -56,11 +56,22 @@ function ProductPage() {
   const [size, setSize] = useState(product.sizes?.[0]);
   const [qty, setQty] = useState(1);
 
+  const active = product.variants?.find(
+    (v) =>
+      (!v.purity || v.purity === purity) &&
+      (!v.color || v.color === metal) &&
+      (!v.size || v.size === size),
+  );
+  const price = active?.price ?? product.price;
+  const mrp = active?.mrp ?? product.mrp;
+  const sku = active?.sku ?? product.sku;
+
   const addToBag = (goToCart = false) => {
     add({ productId: product.id, qty, size, metal, purity });
     toast.success(`${product.name} added to your bag`);
     if (goToCart) navigate({ to: "/cart" });
   };
+
 
   return (
     <div className="min-h-screen">
@@ -88,13 +99,14 @@ function ProductPage() {
         <div>
           <span className="eyebrow">{product.category}</span>
           <h1 className="mt-3 font-display text-4xl md:text-5xl leading-tight">{product.name}</h1>
-          <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">SKU · {product.sku}</p>
+          <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">SKU · {sku}</p>
 
           <div className="mt-6 flex items-baseline gap-3">
-            <span className="font-display text-3xl">{formatINR(product.price)}</span>
-            {product.mrp && (
-              <span className="text-sm text-muted-foreground line-through">{formatINR(product.mrp)}</span>
+            <span className="font-display text-3xl">{formatINR(price)}</span>
+            {mrp && (
+              <span className="text-sm text-muted-foreground line-through">{formatINR(mrp)}</span>
             )}
+
           </div>
           <p className="mt-1 text-xs text-muted-foreground">Inclusive of all taxes · Estimated for base configuration</p>
 
@@ -232,7 +244,7 @@ function ProductPage() {
                 ["Metal", product.metal],
                 ["Gross Weight", `${product.weightGm} g`],
                 ["Certification", "IGI Certificate included"],
-                ["SKU", product.sku],
+                ["SKU", sku],
               ].map(([k, v]) => (
                 <div key={k} className="grid grid-cols-2 py-3">
                   <dt className="text-muted-foreground">{k}</dt>
