@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { ProductGallery } from "@/components/product-gallery";
-import { formatINR } from "@/lib/catalog";
+import { formatINR, type Product } from "@/lib/catalog";
 import { fetchProductByHandle, fetchRelated } from "@/lib/remote-catalog";
 import { useCart } from "@/lib/cart";
 import { ShieldCheck, Award, Truck, Store, Minus, Plus, Heart, Share2 } from "lucide-react";
@@ -47,7 +47,7 @@ export const Route = createFileRoute("/product/$productId")({
 });
 
 function ProductPage() {
-  const { product, related } = Route.useLoaderData();
+  const { product, related } = Route.useLoaderData() as { product: Product; related: Product[] };
   const navigate = useNavigate();
   const { add } = useCart();
 
