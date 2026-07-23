@@ -119,18 +119,16 @@ function mapRow(row: CatalogRow): Product {
 }
 
 export async function fetchProductsByCategory(slug: string): Promise<Product[]> {
-  const types = SLUG_TO_TYPES[slug];
-  let query = posSupabase
+  const { data, error } = await posSupabase
     .from("catalog_products")
     .select(SELECT)
     .eq("status", "active")
     .order("sort_order", { ascending: true });
-
-  if (types && types.length) query = query.in("product_type", types);
-
-  const { data, error } = await query;
   if (error) throw error;
-  return ((data ?? []) as CatalogRow[]).map(mapRow);
+  const rows = (data ?? []) as CatalogRow[];
+  return rows
+    .filter((r) => TYPE_TO_SLUG[(r.product_type ?? "").toLowerCase()] === slug)
+    .map(mapRow);
 }
 
 export async function fetchProductByHandle(handle: string): Promise<Product | null> {
