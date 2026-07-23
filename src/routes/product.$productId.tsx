@@ -56,11 +56,22 @@ function ProductPage() {
   const [size, setSize] = useState(product.sizes?.[0]);
   const [qty, setQty] = useState(1);
 
+  const active = product.variants?.find(
+    (v) =>
+      (!v.purity || v.purity === purity) &&
+      (!v.color || v.color === metal) &&
+      (!v.size || v.size === size),
+  );
+  const price = active?.price ?? product.price;
+  const mrp = active?.mrp ?? product.mrp;
+  const sku = active?.sku ?? product.sku;
+
   const addToBag = (goToCart = false) => {
     add({ productId: product.id, qty, size, metal, purity });
     toast.success(`${product.name} added to your bag`);
     if (goToCart) navigate({ to: "/cart" });
   };
+
 
   return (
     <div className="min-h-screen">
