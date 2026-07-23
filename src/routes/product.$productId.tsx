@@ -4,16 +4,18 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { ProductGallery } from "@/components/product-gallery";
-import { formatINR, getProduct, products } from "@/lib/catalog";
+import { formatINR } from "@/lib/catalog";
+import { fetchProductByHandle, fetchRelated } from "@/lib/remote-catalog";
 import { useCart } from "@/lib/cart";
 import { ShieldCheck, Award, Truck, Store, Minus, Plus, Heart, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/product/$productId")({
-  loader: ({ params }) => {
-    const product = getProduct(params.productId);
+  loader: async ({ params }) => {
+    const product = await fetchProductByHandle(params.productId);
     if (!product) throw notFound();
-    return { product };
+    const related = await fetchRelated(product.category, product.id, 4);
+    return { product, related };
   },
   head: ({ loaderData }) => ({
     meta: loaderData
@@ -45,7 +47,7 @@ export const Route = createFileRoute("/product/$productId")({
 });
 
 function ProductPage() {
-  const { product } = Route.useLoaderData() as { product: import("@/lib/catalog").Product };
+  const { product, related } = Route.useLoaderData();
   const navigate = useNavigate();
   const { add } = useCart();
 
@@ -59,8 +61,6 @@ function ProductPage() {
     toast.success(`${product.name} added to your bag`);
     if (goToCart) navigate({ to: "/cart" });
   };
-
-  const related = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4);
 
   return (
     <div className="min-h-screen">

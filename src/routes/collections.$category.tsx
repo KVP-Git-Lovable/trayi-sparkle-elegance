@@ -2,13 +2,15 @@ import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
-import { categories, products } from "@/lib/catalog";
+import { categories } from "@/lib/catalog";
+import { fetchProductsByCategory } from "@/lib/remote-catalog";
 
 export const Route = createFileRoute("/collections/$category")({
-  loader: ({ params }) => {
-    const cat = categories.find((c) => c.slug === params.category);
-    if (!cat) throw notFound();
-    return { category: cat };
+  loader: async ({ params }) => {
+    const category = categories.find((c) => c.slug === params.category);
+    if (!category) throw notFound();
+    const products = await fetchProductsByCategory(category.slug);
+    return { category, products };
   },
   head: ({ loaderData }) => ({
     meta: loaderData
@@ -38,8 +40,7 @@ export const Route = createFileRoute("/collections/$category")({
 });
 
 function CategoryPage() {
-  const { category } = Route.useLoaderData();
-  const items = products.filter((p) => p.category === category.slug);
+  const { category, products } = Route.useLoaderData();
   return (
     <div className="min-h-screen">
       <SiteHeader />
@@ -57,13 +58,13 @@ function CategoryPage() {
         </div>
       </section>
       <section className="mx-auto max-w-7xl px-6 py-16">
-        {items.length === 0 ? (
+        {products.length === 0 ? (
           <p className="text-center text-muted-foreground py-16">
             New pieces arriving soon. Visit our boutique for the full range.
           </p>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-10">
-            {items.map((p) => <ProductCard key={p.id} product={p} />)}
+            {products.map((p) => <ProductCard key={p.id} product={p} />)}
           </div>
         )}
       </section>
