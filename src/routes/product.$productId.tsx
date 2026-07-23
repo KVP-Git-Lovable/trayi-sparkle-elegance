@@ -99,13 +99,14 @@ function ProductPage() {
         <div>
           <span className="eyebrow">{product.category}</span>
           <h1 className="mt-3 font-display text-4xl md:text-5xl leading-tight">{product.name}</h1>
-          <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">SKU · {product.sku}</p>
+          <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">SKU · {sku}</p>
 
           <div className="mt-6 flex items-baseline gap-3">
-            <span className="font-display text-3xl">{formatINR(product.price)}</span>
-            {product.mrp && (
-              <span className="text-sm text-muted-foreground line-through">{formatINR(product.mrp)}</span>
+            <span className="font-display text-3xl">{formatINR(price)}</span>
+            {mrp && (
+              <span className="text-sm text-muted-foreground line-through">{formatINR(mrp)}</span>
             )}
+
           </div>
           <p className="mt-1 text-xs text-muted-foreground">Inclusive of all taxes · Estimated for base configuration</p>
 
