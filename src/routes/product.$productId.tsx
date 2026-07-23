@@ -244,7 +244,7 @@ function ProductPage() {
                 ["Metal", product.metal],
                 ["Gross Weight", `${product.weightGm} g`],
                 ["Certification", "IGI Certificate included"],
-                ["SKU", product.sku],
+                ["SKU", sku],
               ].map(([k, v]) => (
                 <div key={k} className="grid grid-cols-2 py-3">
                   <dt className="text-muted-foreground">{k}</dt>
