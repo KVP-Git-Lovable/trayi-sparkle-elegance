@@ -41,7 +41,16 @@ export type Product = {
   sku: string;
   weightGm: number;
   diamondCt: number;
+  variants?: Array<{
+    size?: string;
+    color?: string;
+    purity?: string;
+    price: number;
+    mrp?: number;
+    sku: string;
+  }>;
 };
+
 
 const gallery = (main: string) => [main, ringImg, earringImg, pendantImg, braceletImg];
 
