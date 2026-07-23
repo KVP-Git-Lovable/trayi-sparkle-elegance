@@ -27,8 +27,8 @@ const TYPE_TO_SLUG: Record<string, string> = {
   earring: "earrings",
   pendants: "pendants",
   pendant: "pendants",
-  necklaces: "pendants",
-  necklace: "pendants",
+  necklaces: "necklaces",
+  necklace: "necklaces",
   bracelets: "bracelets",
   bracelet: "bracelets",
   bridal: "bridal",
@@ -38,7 +38,8 @@ const TYPE_TO_SLUG: Record<string, string> = {
 const SLUG_TO_TYPES: Record<string, string[]> = {
   rings: ["Rings", "Ring"],
   earrings: ["Earrings", "Earring"],
-  pendants: ["Pendants", "Pendant", "Necklaces", "Necklace"],
+  pendants: ["Pendants", "Pendant"],
+  necklaces: ["Necklaces", "Necklace"],
   bracelets: ["Bracelets", "Bracelet", "Mangalsutra Bracelets"],
   bridal: ["Bridal"],
 };
@@ -48,6 +49,7 @@ const SIZE_LABEL: Record<string, string> = {
   bracelets: "Length",
   earrings: "Size",
   pendants: "Chain Length",
+  necklaces: "Chain Length",
   bridal: "Size",
 };
 

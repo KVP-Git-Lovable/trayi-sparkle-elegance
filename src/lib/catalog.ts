@@ -18,6 +18,7 @@ export const categories: Category[] = [
   { slug: "rings", name: "Rings", tagline: "Solitaires, bands & statement rings", image: ringImg },
   { slug: "earrings", name: "Earrings", tagline: "Studs, drops & chandeliers", image: earringImg },
   { slug: "pendants", name: "Pendants", tagline: "Everyday brilliance", image: pendantImg },
+  { slug: "necklaces", name: "Necklaces", tagline: "Diamond lines for the collarbone", image: pendantImg },
   { slug: "bracelets", name: "Bracelets", tagline: "Tennis & delicate lines", image: braceletImg },
   { slug: "bridal", name: "Bridal", tagline: "Heirlooms for your forever", image: bridalImg },
 ];
