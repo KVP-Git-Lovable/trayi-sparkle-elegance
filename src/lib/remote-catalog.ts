@@ -140,6 +140,7 @@ function mapRow(row: CatalogRow): Product {
     sku,
     weightGm: 0,
     diamondCt: 0,
+    tags: row.tags ?? [],
     variants: variants.length ? variants : undefined,
   };
 }
