@@ -115,12 +115,18 @@ function CategoryPage() {
         shopFor: list(merged.shopFor),
       },
       replace: true,
+      resetScroll: false,
     });
   };
 
 
   const onClear = () =>
-    navigate({ params: { category: category.slug }, search: {} as never, replace: true });
+    navigate({
+      params: { category: category.slug },
+      search: {} as never,
+      replace: true,
+      resetScroll: false,
+    });
 
   const sidebar = (
     <CollectionFilters
