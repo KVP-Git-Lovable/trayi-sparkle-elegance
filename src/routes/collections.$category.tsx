@@ -1,17 +1,53 @@
-import { createFileRoute, notFound, Link } from "@tanstack/react-router";
+import { createFileRoute, notFound, Link, useNavigate } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
+import { CollectionFilters } from "@/components/collection-filters";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { SlidersHorizontal } from "lucide-react";
 import { categories, type Product } from "@/lib/catalog";
 import { fetchProductsByCategory } from "@/lib/remote-catalog";
+import {
+  applyFilters,
+  buildFacets,
+  type Filters,
+} from "@/lib/product-filters";
+
+type Search = {
+  min: number;
+  max: number;
+  purity: string[];
+  color: string[];
+  size: string[];
+  carat: string[];
+  shopFor: string[];
+};
+
+const toList = (v: unknown): string[] =>
+  typeof v === "string" && v.trim() !== ""
+    ? v.split(",").map((s) => s.trim()).filter(Boolean)
+    : Array.isArray(v)
+      ? v.map(String)
+      : [];
 
 export const Route = createFileRoute("/collections/$category")({
+  validateSearch: (search: Record<string, unknown>): Search => ({
+    min: Number(search.min) > 0 ? Number(search.min) : 0,
+    max: Number(search.max) > 0 ? Number(search.max) : 0,
+    purity: toList(search.purity),
+    color: toList(search.color),
+    size: toList(search.size),
+    carat: toList(search.carat),
+    shopFor: toList(search.shopFor),
+  }),
   loader: async ({ params }) => {
     const category = categories.find((c) => c.slug === params.category);
     if (!category) throw notFound();
     const products = await fetchProductsByCategory(category.slug);
     return { category, products };
   },
+
   head: ({ loaderData }) => ({
     meta: loaderData
       ? [
