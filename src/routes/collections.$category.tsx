@@ -77,6 +77,57 @@ export const Route = createFileRoute("/collections/$category")({
 
 function CategoryPage() {
   const { category, products } = Route.useLoaderData();
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: "/collections/$category" });
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const facets = useMemo(() => buildFacets(products), [products]);
+  const filters: Filters = {
+    min: search.min,
+    max: search.max,
+    purity: search.purity,
+    color: search.color,
+    size: search.size,
+    carat: search.carat,
+    shopFor: search.shopFor,
+  };
+
+  const visible = useMemo(
+    () => applyFilters(products, filters, facets.maxPrice),
+    [products, search, facets.maxPrice],
+  );
+
+  const onChange = (next: Partial<Filters>) =>
+    navigate({
+      params: { category: category.slug },
+      search: (prev) => {
+        const merged = { ...prev, ...next } as Search;
+        return {
+          min: merged.min > 0 ? merged.min : undefined,
+          max: merged.max > 0 && merged.max < facets.maxPrice ? merged.max : undefined,
+          purity: merged.purity?.length ? merged.purity.join(",") : undefined,
+          color: merged.color?.length ? merged.color.join(",") : undefined,
+          size: merged.size?.length ? merged.size.join(",") : undefined,
+          carat: merged.carat?.length ? merged.carat.join(",") : undefined,
+          shopFor: merged.shopFor?.length ? merged.shopFor.join(",") : undefined,
+        } as never;
+      },
+      replace: true,
+    });
+
+  const onClear = () =>
+    navigate({ params: { category: category.slug }, search: {} as never, replace: true });
+
+  const sidebar = (
+    <CollectionFilters
+      products={products}
+      facets={facets}
+      filters={filters}
+      onChange={onChange}
+      onClear={onClear}
+    />
+  );
+
   return (
     <div className="min-h-screen">
       <SiteHeader />
@@ -93,14 +144,51 @@ function CategoryPage() {
           </div>
         </div>
       </section>
+
       <section className="mx-auto max-w-7xl px-6 py-16">
         {products.length === 0 ? (
           <p className="text-center text-muted-foreground py-16">
             New pieces arriving soon. Visit our boutique for the full range.
           </p>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-10">
-            {products.map((p: Product) => <ProductCard key={p.id} product={p} />)}
+          <div className="grid gap-10 lg:grid-cols-[260px_minmax(0,1fr)]">
+            <aside className="hidden lg:block">
+              <div className="sticky top-28">{sidebar}</div>
+            </aside>
+
+            <div className="min-w-0">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b border-border/60 pb-4">
+                <p className="min-w-0 truncate text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+                  {visible.length} {visible.length === 1 ? "piece" : "pieces"}
+                </p>
+                <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+                  <SheetTrigger asChild>
+                    <button className="lg:hidden inline-flex shrink-0 items-center gap-2 border border-border px-4 py-2 text-[11px] uppercase tracking-[0.22em]">
+                      <SlidersHorizontal className="h-4 w-4" /> Filters
+                    </button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-[85vw] max-w-sm overflow-y-auto px-6 py-10">
+                    {sidebar}
+                  </SheetContent>
+                </Sheet>
+              </div>
+
+              {visible.length === 0 ? (
+                <div className="py-24 text-center">
+                  <p className="text-muted-foreground">No pieces match these filters.</p>
+                  <button
+                    onClick={onClear}
+                    className="mt-4 text-[11px] uppercase tracking-[0.22em] text-accent hover:underline underline-offset-4"
+                  >
+                    Clear all filters
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-8 grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
+                  {visible.map((p: Product) => <ProductCard key={p.id} product={p} />)}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </section>
@@ -108,3 +196,4 @@ function CategoryPage() {
     </div>
   );
 }
+
