@@ -120,10 +120,17 @@ const hasAny = (selected: string[], values: (string | undefined)[]) =>
   selected.length === 0 ||
   values.some((v) => v && selected.some((s) => norm(s) === norm(v)));
 
+/** The price shown on the card: the product's own price, else its lowest variant price. */
+export function displayPrice(p: Product): number | undefined {
+  if (p.price > 0) return p.price;
+  const prices = productPrices(p);
+  return prices.length ? Math.min(...prices) : undefined;
+}
+
 export function matches(p: Product, f: Filters, facetMax: number): boolean {
   const max = f.max > 0 ? f.max : facetMax;
-  const prices = productPrices(p);
-  if (prices.length && !prices.some((n) => n >= f.min && n <= max)) return false;
+  const price = displayPrice(p);
+  if (price !== undefined && (price < f.min || price > max)) return false;
 
   if (
     !hasAny(f.purity, [
