@@ -14,10 +14,11 @@ type CatalogRow = {
   compare_at_price: number | null;
   options: Record<string, string[]> | null;
   variants: Array<Record<string, unknown>> | null;
+  tags: string[] | null;
 };
 
 const SELECT =
-  "id,handle,title,vendor,product_type,image_url,description,display_price,base_price,compare_at_price,options,variants";
+  "id,handle,title,vendor,product_type,image_url,description,display_price,base_price,compare_at_price,options,variants,tags";
 
 // product_type (from Shopify export) → Lumina category slug
 const TYPE_TO_SLUG: Record<string, string> = {
@@ -139,6 +140,7 @@ function mapRow(row: CatalogRow): Product {
     sku,
     weightGm: 0,
     diamondCt: 0,
+    tags: row.tags ?? [],
     variants: variants.length ? variants : undefined,
   };
 }
