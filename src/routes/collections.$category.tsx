@@ -15,32 +15,34 @@ import {
 } from "@/lib/product-filters";
 
 type Search = {
-  min: number;
-  max: number;
-  purity: string[];
-  color: string[];
-  size: string[];
-  carat: string[];
-  shopFor: string[];
+  min?: number;
+  max?: number;
+  purity?: string;
+  color?: string;
+  size?: string;
+  carat?: string;
+  shopFor?: string;
 };
 
-const toList = (v: unknown): string[] =>
-  typeof v === "string" && v.trim() !== ""
-    ? v.split(",").map((s) => s.trim()).filter(Boolean)
-    : Array.isArray(v)
-      ? v.map(String)
-      : [];
+const toList = (v: string | undefined): string[] =>
+  v && v.trim() !== "" ? v.split(",").map((s) => s.trim()).filter(Boolean) : [];
+
+const str = (v: unknown): string | undefined => {
+  const s = typeof v === "string" ? v.trim() : Array.isArray(v) ? v.join(",") : "";
+  return s ? s : undefined;
+};
 
 export const Route = createFileRoute("/collections/$category")({
   validateSearch: (search: Record<string, unknown>): Search => ({
-    min: Number(search.min) > 0 ? Number(search.min) : 0,
-    max: Number(search.max) > 0 ? Number(search.max) : 0,
-    purity: toList(search.purity),
-    color: toList(search.color),
-    size: toList(search.size),
-    carat: toList(search.carat),
-    shopFor: toList(search.shopFor),
+    min: Number(search.min) > 0 ? Number(search.min) : undefined,
+    max: Number(search.max) > 0 ? Number(search.max) : undefined,
+    purity: str(search.purity),
+    color: str(search.color),
+    size: str(search.size),
+    carat: str(search.carat),
+    shopFor: str(search.shopFor),
   }),
+
   loader: async ({ params }) => {
     const category = categories.find((c) => c.slug === params.category);
     if (!category) throw notFound();
