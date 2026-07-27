@@ -100,7 +100,7 @@ function CategoryPage() {
   const onChange = (next: Partial<Filters>) =>
     navigate({
       params: { category: category.slug },
-      search: (prev) => {
+      search: (prev: Search) => {
         const merged = { ...prev, ...next } as Search;
         return {
           min: merged.min > 0 ? merged.min : undefined,
