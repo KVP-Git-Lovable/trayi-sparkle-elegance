@@ -85,13 +85,13 @@ function CategoryPage() {
 
   const facets = useMemo(() => buildFacets(products), [products]);
   const filters: Filters = {
-    min: search.min,
-    max: search.max,
-    purity: search.purity,
-    color: search.color,
-    size: search.size,
-    carat: search.carat,
-    shopFor: search.shopFor,
+    min: search.min ?? 0,
+    max: search.max ?? 0,
+    purity: toList(search.purity),
+    color: toList(search.color),
+    size: toList(search.size),
+    carat: toList(search.carat),
+    shopFor: toList(search.shopFor),
   };
 
   const visible = useMemo(
@@ -99,23 +99,25 @@ function CategoryPage() {
     [products, search, facets.maxPrice],
   );
 
-  const onChange = (next: Partial<Filters>) =>
+  const onChange = (next: Partial<Filters>) => {
+    const merged: Filters = { ...filters, ...next };
+    const list = (v: string[]) => (v.length ? v.join(",") : undefined);
     navigate({
       params: { category: category.slug },
-      search: (prev: Search) => {
-        const merged = { ...prev, ...next } as Search;
-        return {
-          min: merged.min > 0 ? merged.min : undefined,
-          max: merged.max > 0 && merged.max < facets.maxPrice ? merged.max : undefined,
-          purity: merged.purity?.length ? merged.purity.join(",") : undefined,
-          color: merged.color?.length ? merged.color.join(",") : undefined,
-          size: merged.size?.length ? merged.size.join(",") : undefined,
-          carat: merged.carat?.length ? merged.carat.join(",") : undefined,
-          shopFor: merged.shopFor?.length ? merged.shopFor.join(",") : undefined,
-        } as never;
+      search: {
+        min: merged.min > 0 ? merged.min : undefined,
+        max:
+          merged.max > 0 && merged.max < facets.maxPrice ? merged.max : undefined,
+        purity: list(merged.purity),
+        color: list(merged.color),
+        size: list(merged.size),
+        carat: list(merged.carat),
+        shopFor: list(merged.shopFor),
       },
       replace: true,
     });
+  };
+
 
   const onClear = () =>
     navigate({ params: { category: category.slug }, search: {} as never, replace: true });
