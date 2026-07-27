@@ -41,6 +41,7 @@ export type Product = {
   sku: string;
   weightGm: number;
   diamondCt: number;
+  tags?: string[];
   variants?: Array<{
     size?: string;
     color?: string;
