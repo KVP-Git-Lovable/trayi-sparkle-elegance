@@ -41,9 +41,15 @@ export function SiteHeader() {
         </Link>
 
         <div className="flex flex-1 items-center justify-end gap-4 text-foreground/80">
-          <Link to="/login" aria-label="Account" className="hover:text-accent transition-colors">
-            <User className="h-5 w-5" />
-          </Link>
+          {user ? (
+            <Link to="/account" aria-label="My account" title="My account" className="hover:text-accent transition-colors">
+              <User className="h-5 w-5 text-accent" />
+            </Link>
+          ) : (
+            <Link to="/login" aria-label="Sign in" title="Sign in" className="hover:text-accent transition-colors">
+              <User className="h-5 w-5" />
+            </Link>
+          )}
           <Link to="/cart" aria-label="Cart" className="relative hover:text-accent transition-colors">
             <ShoppingBag className="h-5 w-5" />
             <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-medium text-accent-foreground">
