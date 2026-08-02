@@ -7,6 +7,8 @@ import { ProductGallery } from "@/components/product-gallery";
 import { formatINR, type Product } from "@/lib/catalog";
 import { fetchProductByHandle, fetchRelated } from "@/lib/remote-catalog";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
+import { useWishlist } from "@/lib/wishlist";
 import { ShieldCheck, Award, Truck, Store, Minus, Plus, Heart, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -71,6 +73,42 @@ function ProductPage() {
     toast.success(`${product.name} added to your bag`);
     if (goToCart) navigate({ to: "/cart" });
   };
+
+  const { user } = useAuth();
+  const { has, toggle } = useWishlist();
+  const saved = has(product.id);
+
+  const onWishlist = async () => {
+    if (!user) {
+      toast.info("Sign in to save pieces to your wishlist");
+      navigate({ to: "/login" });
+      return;
+    }
+    const result = await toggle(product, price);
+    if (result === "added") toast.success(`${product.name} saved to your wishlist`);
+    if (result === "removed") toast.success("Removed from your wishlist");
+  };
+
+  const onShare = async () => {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    const shareData = {
+      title: product.name,
+      text: `${product.name} — Trayi Jewellery`,
+      url,
+    };
+    try {
+      if (typeof navigator !== "undefined" && navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied to clipboard");
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      toast.error("Could not share this piece");
+    }
+  };
+
 
 
   return (
