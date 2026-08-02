@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as OrderConfirmationRouteImport } from './routes/order-confirmation'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as EducationRouteImport } from './routes/education'
@@ -16,11 +17,18 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CollectionsIndexRouteImport } from './routes/collections.index'
 import { Route as ProductProductIdRouteImport } from './routes/product.$productId'
 import { Route as CollectionsCategoryRouteImport } from './routes/collections.$category'
+import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrderConfirmationRoute = OrderConfirmationRouteImport.update({
   id: '/order-confirmation',
   path: '/order-confirmation',
@@ -56,6 +64,10 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -76,6 +88,11 @@ const CollectionsCategoryRoute = CollectionsCategoryRouteImport.update({
   path: '/collections/$category',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -86,6 +103,8 @@ export interface FileRoutesByFullPath {
   '/education': typeof EducationRoute
   '/login': typeof LoginRoute
   '/order-confirmation': typeof OrderConfirmationRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/collections/$category': typeof CollectionsCategoryRoute
   '/product/$productId': typeof ProductProductIdRoute
   '/collections/': typeof CollectionsIndexRoute
@@ -99,6 +118,8 @@ export interface FileRoutesByTo {
   '/education': typeof EducationRoute
   '/login': typeof LoginRoute
   '/order-confirmation': typeof OrderConfirmationRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/collections/$category': typeof CollectionsCategoryRoute
   '/product/$productId': typeof ProductProductIdRoute
   '/collections': typeof CollectionsIndexRoute
@@ -106,6 +127,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
@@ -113,6 +135,8 @@ export interface FileRoutesById {
   '/education': typeof EducationRoute
   '/login': typeof LoginRoute
   '/order-confirmation': typeof OrderConfirmationRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/collections/$category': typeof CollectionsCategoryRoute
   '/product/$productId': typeof ProductProductIdRoute
   '/collections/': typeof CollectionsIndexRoute
@@ -128,6 +152,8 @@ export interface FileRouteTypes {
     | '/education'
     | '/login'
     | '/order-confirmation'
+    | '/reset-password'
+    | '/account'
     | '/collections/$category'
     | '/product/$productId'
     | '/collections/'
@@ -141,12 +167,15 @@ export interface FileRouteTypes {
     | '/education'
     | '/login'
     | '/order-confirmation'
+    | '/reset-password'
+    | '/account'
     | '/collections/$category'
     | '/product/$productId'
     | '/collections'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/about'
     | '/cart'
     | '/checkout'
@@ -154,6 +183,8 @@ export interface FileRouteTypes {
     | '/education'
     | '/login'
     | '/order-confirmation'
+    | '/reset-password'
+    | '/_authenticated/account'
     | '/collections/$category'
     | '/product/$productId'
     | '/collections/'
@@ -161,6 +192,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
@@ -168,6 +200,7 @@ export interface RootRouteChildren {
   EducationRoute: typeof EducationRoute
   LoginRoute: typeof LoginRoute
   OrderConfirmationRoute: typeof OrderConfirmationRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   CollectionsCategoryRoute: typeof CollectionsCategoryRoute
   ProductProductIdRoute: typeof ProductProductIdRoute
   CollectionsIndexRoute: typeof CollectionsIndexRoute
@@ -175,6 +208,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/order-confirmation': {
       id: '/order-confirmation'
       path: '/order-confirmation'
@@ -224,6 +264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -252,11 +299,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CollectionsCategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
@@ -264,6 +330,7 @@ const rootRouteChildren: RootRouteChildren = {
   EducationRoute: EducationRoute,
   LoginRoute: LoginRoute,
   OrderConfirmationRoute: OrderConfirmationRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   CollectionsCategoryRoute: CollectionsCategoryRoute,
   ProductProductIdRoute: ProductProductIdRoute,
   CollectionsIndexRoute: CollectionsIndexRoute,
@@ -271,13 +338,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

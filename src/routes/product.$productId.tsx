@@ -7,6 +7,8 @@ import { ProductGallery } from "@/components/product-gallery";
 import { formatINR, type Product } from "@/lib/catalog";
 import { fetchProductByHandle, fetchRelated } from "@/lib/remote-catalog";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
+import { useWishlist } from "@/lib/wishlist";
 import { ShieldCheck, Award, Truck, Store, Minus, Plus, Heart, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -71,6 +73,42 @@ function ProductPage() {
     toast.success(`${product.name} added to your bag`);
     if (goToCart) navigate({ to: "/cart" });
   };
+
+  const { user } = useAuth();
+  const { has, toggle } = useWishlist();
+  const saved = has(product.id);
+
+  const onWishlist = async () => {
+    if (!user) {
+      toast.info("Sign in to save pieces to your wishlist");
+      navigate({ to: "/login" });
+      return;
+    }
+    const result = await toggle(product, price);
+    if (result === "added") toast.success(`${product.name} saved to your wishlist`);
+    if (result === "removed") toast.success("Removed from your wishlist");
+  };
+
+  const onShare = async () => {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    const shareData = {
+      title: product.name,
+      text: `${product.name} — Trayi Jewellery`,
+      url,
+    };
+    try {
+      if (typeof navigator !== "undefined" && navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied to clipboard");
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      toast.error("Could not share this piece");
+    }
+  };
+
 
 
   return (
@@ -202,8 +240,16 @@ function ProductPage() {
           </div>
 
           <div className="mt-4 flex gap-6 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-            <button className="inline-flex items-center gap-2 hover:text-accent"><Heart className="h-4 w-4" /> Wishlist</button>
-            <button className="inline-flex items-center gap-2 hover:text-accent"><Share2 className="h-4 w-4" /> Share</button>
+            <button
+              onClick={onWishlist}
+              aria-pressed={saved}
+              className={`inline-flex items-center gap-2 hover:text-accent ${saved ? "text-accent" : ""}`}
+            >
+              <Heart className={`h-4 w-4 ${saved ? "fill-current" : ""}`} /> {saved ? "Saved" : "Wishlist"}
+            </button>
+            <button onClick={onShare} className="inline-flex items-center gap-2 hover:text-accent">
+              <Share2 className="h-4 w-4" /> Share
+            </button>
           </div>
 
           {/* Fulfilment */}
