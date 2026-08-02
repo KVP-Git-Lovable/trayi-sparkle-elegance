@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as OrderConfirmationRouteImport } from './routes/order-confirmation'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as EducationRouteImport } from './routes/education'
@@ -21,6 +22,11 @@ import { Route as CollectionsIndexRouteImport } from './routes/collections.index
 import { Route as ProductProductIdRouteImport } from './routes/product.$productId'
 import { Route as CollectionsCategoryRouteImport } from './routes/collections.$category'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrderConfirmationRoute = OrderConfirmationRouteImport.update({
   id: '/order-confirmation',
   path: '/order-confirmation',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/education': typeof EducationRoute
   '/login': typeof LoginRoute
   '/order-confirmation': typeof OrderConfirmationRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/collections/$category': typeof CollectionsCategoryRoute
   '/product/$productId': typeof ProductProductIdRoute
   '/collections/': typeof CollectionsIndexRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/education': typeof EducationRoute
   '/login': typeof LoginRoute
   '/order-confirmation': typeof OrderConfirmationRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/collections/$category': typeof CollectionsCategoryRoute
   '/product/$productId': typeof ProductProductIdRoute
   '/collections': typeof CollectionsIndexRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/education': typeof EducationRoute
   '/login': typeof LoginRoute
   '/order-confirmation': typeof OrderConfirmationRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/collections/$category': typeof CollectionsCategoryRoute
   '/product/$productId': typeof ProductProductIdRoute
   '/collections/': typeof CollectionsIndexRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/education'
     | '/login'
     | '/order-confirmation'
+    | '/reset-password'
     | '/collections/$category'
     | '/product/$productId'
     | '/collections/'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/education'
     | '/login'
     | '/order-confirmation'
+    | '/reset-password'
     | '/collections/$category'
     | '/product/$productId'
     | '/collections'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/education'
     | '/login'
     | '/order-confirmation'
+    | '/reset-password'
     | '/collections/$category'
     | '/product/$productId'
     | '/collections/'
@@ -168,6 +180,7 @@ export interface RootRouteChildren {
   EducationRoute: typeof EducationRoute
   LoginRoute: typeof LoginRoute
   OrderConfirmationRoute: typeof OrderConfirmationRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   CollectionsCategoryRoute: typeof CollectionsCategoryRoute
   ProductProductIdRoute: typeof ProductProductIdRoute
   CollectionsIndexRoute: typeof CollectionsIndexRoute
@@ -175,6 +188,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/order-confirmation': {
       id: '/order-confirmation'
       path: '/order-confirmation'
@@ -264,6 +284,7 @@ const rootRouteChildren: RootRouteChildren = {
   EducationRoute: EducationRoute,
   LoginRoute: LoginRoute,
   OrderConfirmationRoute: OrderConfirmationRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   CollectionsCategoryRoute: CollectionsCategoryRoute,
   ProductProductIdRoute: ProductProductIdRoute,
   CollectionsIndexRoute: CollectionsIndexRoute,
