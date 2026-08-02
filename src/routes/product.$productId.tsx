@@ -202,8 +202,16 @@ function ProductPage() {
           </div>
 
           <div className="mt-4 flex gap-6 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-            <button className="inline-flex items-center gap-2 hover:text-accent"><Heart className="h-4 w-4" /> Wishlist</button>
-            <button className="inline-flex items-center gap-2 hover:text-accent"><Share2 className="h-4 w-4" /> Share</button>
+            <button
+              onClick={onWishlist}
+              aria-pressed={saved}
+              className={`inline-flex items-center gap-2 hover:text-accent ${saved ? "text-accent" : ""}`}
+            >
+              <Heart className={`h-4 w-4 ${saved ? "fill-current" : ""}`} /> {saved ? "Saved" : "Wishlist"}
+            </button>
+            <button onClick={onShare} className="inline-flex items-center gap-2 hover:text-accent">
+              <Share2 className="h-4 w-4" /> Share
+            </button>
           </div>
 
           {/* Fulfilment */}
