@@ -40,16 +40,31 @@ function LoginPage() {
 
   const oauth = async (provider: "google" | "apple" | "facebook" | "instagram") => {
     setBusy(true);
-    const result = await lovable.auth.signInWithOAuth(provider, {
-      redirect_uri: window.location.origin,
-    });
-    setBusy(false);
-    if (result.error) {
-      toast.error(result.error.message ?? "Could not sign in. Please try again.");
-      return;
+    try {
+      if (provider === "facebook" || provider === "instagram") {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider,
+          options: {
+            redirectTo: window.location.origin,
+          },
+        });
+        if (error) throw error;
+      } else {
+        const result = await lovable.auth.signInWithOAuth(provider, {
+          redirect_uri: window.location.origin,
+        });
+        if (result.error) throw result.error;
+        if (result.redirected) {
+          setBusy(false);
+          return;
+        }
+      }
+      navigate({ to: "/account" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not sign in. Please try again.");
+    } finally {
+      setBusy(false);
     }
-    if (result.redirected) return;
-    navigate({ to: "/account" });
   };
 
   const submit = async (e: React.FormEvent) => {
