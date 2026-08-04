@@ -183,27 +183,6 @@ export function CollectionFilters({
         </Section>
       )}
 
-      {facets.carat.length > 0 && (
-        <Section title="Carat">
-          <OptionList
-            options={facets.carat}
-            selected={filters.carat}
-            onToggle={toggle("carat")}
-            counts={counts("carat", facets.carat)}
-          />
-        </Section>
-      )}
-
-      {facets.purity.length > 0 && (
-        <Section title="Purity">
-          <OptionList
-            options={facets.purity}
-            selected={filters.purity}
-            onToggle={toggle("purity")}
-            counts={counts("purity", facets.purity)}
-          />
-        </Section>
-      )}
 
       {facets.color.length > 0 && (
         <Section title="Colour">
