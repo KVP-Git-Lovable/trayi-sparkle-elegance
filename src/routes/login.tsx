@@ -38,7 +38,7 @@ function LoginPage() {
     if (!loading && user) navigate({ to: "/account", replace: true });
   }, [user, loading, navigate]);
 
-  const oauth = async (provider: "google" | "apple") => {
+  const oauth = async (provider: "google" | "apple" | "facebook" | "instagram") => {
     setBusy(true);
     const result = await lovable.auth.signInWithOAuth(provider, {
       redirect_uri: window.location.origin,
@@ -149,6 +149,22 @@ function LoginPage() {
                       className="w-full flex items-center justify-center gap-3 border border-input py-3 text-sm hover:border-accent hover:text-accent transition-colors disabled:opacity-50"
                     >
                       <AppleIcon /> Continue with Apple
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => oauth("facebook")}
+                      className="w-full flex items-center justify-center gap-3 border border-input py-3 text-sm hover:border-accent hover:text-accent transition-colors disabled:opacity-50"
+                    >
+                      <FacebookIcon /> Continue with Facebook
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => oauth("instagram")}
+                      className="w-full flex items-center justify-center gap-3 border border-input py-3 text-sm hover:border-accent hover:text-accent transition-colors disabled:opacity-50"
+                    >
+                      <InstagramIcon /> Continue with Instagram
                     </button>
                   </div>
 
@@ -261,6 +277,22 @@ function AppleIcon() {
   return (
     <svg viewBox="0 0 24 24" className="h-4 w-4 fill-foreground" aria-hidden>
       <path d="M16.4 12.5c0-2.6 2.1-3.8 2.2-3.9-1.2-1.7-3-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.4 1-4.3 2.6-1.8 3.2-.5 8 1.3 10.6.9 1.3 1.9 2.7 3.3 2.6 1.3-.1 1.8-.9 3.4-.9 1.6 0 2.1.9 3.5.8 1.5 0 2.4-1.3 3.3-2.6.7-1 1.2-2 1.6-3.1-.1 0-3.1-1.2-3.3-4.1zM13.9 4.9c.7-.9 1.2-2.1 1-3.4-1 .1-2.3.7-3 1.6-.7.8-1.3 2-1.1 3.3 1.1.1 2.4-.6 3.1-1.5z"/>
+    </svg>
+  );
+}
+
+function FacebookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 fill-foreground" aria-hidden>
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+    </svg>
+  );
+}
+
+function InstagramIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 fill-foreground" aria-hidden>
+      <path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.117.63c-.794.297-1.473.648-2.15 1.325-.677.677-1.028 1.356-1.325 2.15-.297.788-.5 1.658-.56 2.936C.015 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.263 2.148.56 2.936.297.792.648 1.472 1.325 2.15.677.677 1.356 1.028 2.15 1.325.788.297 1.659.5 2.936.56 1.28.058 1.687.072 4.947.072s3.667-.015 4.947-.072c1.280-.06 2.136-.263 2.935-.56.792-.297 1.472-.648 2.15-1.325.677-.678 1.028-1.355 1.325-2.15.297-.791.5-1.656.56-2.936.058-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.279-.263-2.148-.56-2.936-.297-.792-.648-1.472-1.325-2.15C21.3 1.27 20.6.923 19.8.63c-.788-.297-1.659-.5-2.936-.56C15.667.015 15.26 0 12 0zm0 2.16c3.203 0 3.585.009 4.849.070 1.171.054 1.805.244 2.227.408.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.354 1.057.408 2.227.061 1.264.07 1.645.07 4.849s-.009 3.585-.07 4.849c-.054 1.171-.244 1.806-.408 2.228-.217.561-.477.96-.896 1.382-.42.419-.819.679-1.381.896-.422.164-1.056.354-2.227.408-1.265.061-1.645.07-4.849.07s-3.585-.009-4.849-.07c-1.171-.054-1.805-.244-2.228-.408-.561-.217-.96-.477-1.382-.896-.419-.42-.679-.819-.896-1.381-.164-.422-.354-1.057-.408-2.227-.061-1.264-.07-1.645-.07-4.849s.009-3.585.07-4.849c.054-1.171.244-1.806.408-2.228.217-.561.477-.96.896-1.382.42-.419.819-.679 1.381-.896.422-.164 1.057-.354 2.228-.408 1.264-.061 1.644-.07 4.849-.07zM5.838 12a6.162 6.162 0 1 1 12.324 0 6.162 6.162 0 0 1-12.324 0zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm4.965-10.322a1.44 1.44 0 1 1 2.881.001 1.44 1.44 0 0 1-2.881-.001z"/>
     </svg>
   );
 }
