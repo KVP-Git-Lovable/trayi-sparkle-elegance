@@ -42,13 +42,14 @@ function LoginPage() {
     setBusy(true);
     try {
       if (provider === "facebook" || provider === "instagram") {
-        const { data, error } = await supabase.auth.signInWithOAuth({
-          provider,
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "facebook",
           options: {
             redirectTo: window.location.origin,
           },
         });
         if (error) throw error;
+
       } else {
         const result = await lovable.auth.signInWithOAuth(provider, {
           redirect_uri: window.location.origin,

@@ -5,6 +5,8 @@ import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { ProductGallery } from "@/components/product-gallery";
 import { formatINR, type Product } from "@/lib/catalog";
+import { applySchemeToPrice } from "@/lib/pos-schemes";
+
 import { fetchProductByHandle, fetchRelated } from "@/lib/remote-catalog";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
@@ -64,9 +66,16 @@ function ProductPage() {
       (!v.color || v.color === metal) &&
       (!v.size || v.size === size),
   );
-  const price = active?.price ?? product.price;
+  const listPrice = active?.price ?? product.price;
   const mrp = active?.mrp ?? product.mrp;
   const sku = active?.sku ?? product.sku;
+
+  const schemePricing = product.appliedScheme
+    ? applySchemeToPrice(product.appliedScheme, listPrice)
+    : null;
+  const hasOffer = !!schemePricing && schemePricing.discountAmount > 0;
+  const price = hasOffer ? schemePricing!.effectivePrice : listPrice;
+
 
   const addToBag = (goToCart = false) => {
     add({ productId: product.id, qty, size, metal, purity });
@@ -139,13 +148,28 @@ function ProductPage() {
           <h1 className="mt-3 font-display text-4xl md:text-5xl leading-tight">{product.name}</h1>
           <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">SKU · {sku}</p>
 
-          <div className="mt-6 flex items-baseline gap-3">
-            <span className="font-display text-3xl">{formatINR(price)}</span>
-            {mrp && (
-              <span className="text-sm text-muted-foreground line-through">{formatINR(mrp)}</span>
-            )}
+          {hasOffer && (
+            <div className="mt-6 inline-block bg-accent px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-accent-foreground">
+              {product.offer?.schemeName ?? "Special offer"}
+            </div>
+          )}
 
+          <div className={`${hasOffer ? "mt-3" : "mt-6"} flex items-baseline gap-3`}>
+            <span className="font-display text-3xl">{formatINR(price)}</span>
+            {hasOffer ? (
+              <span className="text-sm text-muted-foreground line-through">{formatINR(listPrice)}</span>
+            ) : (
+              mrp && (
+                <span className="text-sm text-muted-foreground line-through">{formatINR(mrp)}</span>
+              )
+            )}
           </div>
+          {hasOffer && (
+            <p className="mt-1 text-sm font-medium text-green-600">
+              You save {formatINR(schemePricing!.discountAmount)}
+            </p>
+          )}
+
           <p className="mt-1 text-xs text-muted-foreground">Inclusive of all taxes · Estimated for base configuration</p>
 
           <p className="mt-6 text-sm text-foreground/80 leading-relaxed">{product.description}</p>
