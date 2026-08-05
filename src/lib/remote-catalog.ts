@@ -146,67 +146,90 @@ function mapRow(row: CatalogRow): Product {
     variants: variants.length ? variants : undefined,
   };
 }
+/** Active promotional schemes configured in the POS Scheme Config Master. */
+export async function fetchActiveSchemes(): Promise<Scheme[]> {
+  try {
+    const { data, error } = await posSupabase
+      .from("schemes")
+      .select("*")
+      .eq("status", "active");
+    if (error) throw error;
+    return (data ?? []) as Scheme[];
+  } catch (err) {
+    console.warn("Failed to fetch schemes:", err);
+    return [];
+  }
+}
 
+/** Attach the winning scheme (same rules as POS Catalog Master) to a product. */
+function applySchemes(product: Product, row: CatalogRow, schemes: Scheme[]): Product {
+  const basePrice = row.base_price ?? product.price;
+  if (!basePrice || schemes.length === 0) return product;
+
+  const result = evaluateApplicableSchemes(
+    {
+      productId: row.id,
+      productName: row.title,
+      category: row.product_type ?? "",
+      basePrice,
+    },
+    schemes,
+  );
+
+  if (!result || result.discountAmount <= 0) return product;
+
+  product.appliedScheme = result.scheme;
+  product.offer = {
+    schemeName: result.scheme.name,
+    bannerText: result.scheme.name,
+    badgeText: "Offer Valid",
+    discountAmount: result.discountAmount,
+    discountPercent:
+      result.scheme.discount_type === "percentage"
+        ? result.scheme.discount_value
+        : Math.round((result.discountAmount / basePrice) * 100),
+    offerPrice: result.effectivePrice,
+    validFrom: result.scheme.start_date,
+    validTo: result.scheme.end_date,
+  };
+  return product;
+}
 
 export async function fetchProductsByCategory(slug: string): Promise<Product[]> {
-  const { data, error } = await posSupabase
-    .from("catalog_products")
-    .select(SELECT)
-    .eq("status", "active")
-    .order("sort_order", { ascending: true });
+  const [{ data, error }, schemes] = await Promise.all([
+    posSupabase
+      .from("catalog_products")
+      .select(SELECT)
+      .eq("status", "active")
+      .order("sort_order", { ascending: true }),
+    fetchActiveSchemes(),
+  ]);
   if (error) throw error;
 
-  const offersMap = await fetchOffers();
   const rows = (data ?? []) as CatalogRow[];
 
   return rows
     .filter((r) => TYPE_TO_SLUG[(r.product_type ?? "").toLowerCase()] === slug)
-    .map(row => {
-      const product = mapRow(row);
-      const offer = offersMap[product.id];
-      if (offer) {
-        product.offer = {
-          bannerText: offer.banner_text,
-          badgeText: offer.badge_text,
-          discountAmount: offer.discount_amount,
-          discountPercent: offer.discount_percent,
-          validFrom: offer.valid_from,
-          validTo: offer.valid_to,
-        };
-      }
-      return product;
-    });
+    .map((row) => applySchemes(mapRow(row), row, schemes));
 }
 
 export async function fetchProductByHandle(handle: string): Promise<Product | null> {
   // Try handle first, then id
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(handle);
-  const { data, error } = await posSupabase
-    .from("catalog_products")
-    .select(SELECT)
-    .eq("status", "active")
-    .eq(isUuid ? "id" : "handle", handle)
-    .maybeSingle();
+  const [{ data, error }, schemes] = await Promise.all([
+    posSupabase
+      .from("catalog_products")
+      .select(SELECT)
+      .eq("status", "active")
+      .eq(isUuid ? "id" : "handle", handle)
+      .maybeSingle(),
+    fetchActiveSchemes(),
+  ]);
   if (error) throw error;
-
   if (!data) return null;
 
-  const product = mapRow(data as CatalogRow);
-  const offersMap = await fetchOffers();
-  const offer = offersMap[product.id];
-
-  if (offer) {
-    product.offer = {
-      bannerText: offer.banner_text,
-      badgeText: offer.badge_text,
-      discountAmount: offer.discount_amount,
-      discountPercent: offer.discount_percent,
-      validFrom: offer.valid_from,
-      validTo: offer.valid_to,
-    };
-  }
-
-  return product;
+  const row = data as CatalogRow;
+  return applySchemes(mapRow(row), row, schemes);
 }
 
 export async function fetchRelated(
@@ -218,38 +241,4 @@ export async function fetchRelated(
   return items.filter((p) => p.id !== excludeId).slice(0, limit);
 }
 
-export async function fetchOffers(): Promise<Record<string, Offer>> {
-  try {
-    const { data, error } = await posSupabase
-      .from("promotions")
-      .select("*")
-      .eq("status", "active");
-
-    if (error) throw error;
-
-    const offersMap: Record<string, Offer> = {};
-    (data ?? []).forEach((offer: any) => {
-      const key = offer.product_handle || offer.product_id || offer.id;
-      if (key) {
-        offersMap[key] = {
-          id: offer.id,
-          product_id: offer.product_id,
-          product_handle: offer.product_handle,
-          title: offer.title || offer.name,
-          description: offer.description,
-          discount_amount: offer.discount_amount,
-          discount_percent: offer.discount_percent,
-          valid_from: offer.valid_from,
-          valid_to: offer.valid_to,
-          badge_text: offer.badge_text,
-          banner_text: offer.banner_text,
-          status: offer.status,
-        };
-      }
-    });
-    return offersMap;
-  } catch (err) {
-    console.warn("Failed to fetch offers:", err);
-    return {};
-  }
 }
