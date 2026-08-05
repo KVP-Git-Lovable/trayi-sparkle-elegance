@@ -51,13 +51,16 @@ export type Product = {
     sku: string;
   }>;
   offer?: {
+    schemeName?: string;
     bannerText?: string;
     badgeText?: string;
     discountAmount?: number;
     discountPercent?: number;
+    offerPrice?: number;
     validFrom?: string;
     validTo?: string;
   };
+
 };
 
 
