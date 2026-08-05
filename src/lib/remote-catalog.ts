@@ -1,5 +1,6 @@
 import { posSupabase } from "./pos-supabase";
 import type { Product } from "./catalog";
+import { evaluateApplicableSchemes, type Scheme } from "./pos-schemes";
 
 type CatalogRow = {
   id: string;
@@ -17,20 +18,6 @@ type CatalogRow = {
   tags: string[] | null;
 };
 
-export type Offer = {
-  id: string;
-  product_id?: string;
-  product_handle?: string;
-  title: string;
-  description?: string;
-  discount_amount?: number;
-  discount_percent?: number;
-  valid_from?: string;
-  valid_to?: string;
-  badge_text?: string;
-  banner_text?: string;
-  status?: string;
-};
 
 const SELECT =
   "id,handle,title,vendor,product_type,image_url,description,display_price,base_price,compare_at_price,options,variants,tags";
