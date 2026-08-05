@@ -5,6 +5,8 @@ import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { ProductGallery } from "@/components/product-gallery";
 import { formatINR, type Product } from "@/lib/catalog";
+import { applySchemeToPrice } from "@/lib/pos-schemes";
+
 import { fetchProductByHandle, fetchRelated } from "@/lib/remote-catalog";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
