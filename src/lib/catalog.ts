@@ -1,4 +1,6 @@
+import type { Scheme } from "@/lib/pos-schemes";
 import ringImg from "@/assets/cat-rings.jpg";
+
 import earringImg from "@/assets/cat-earrings.jpg";
 import pendantImg from "@/assets/cat-pendants.jpg";
 import braceletImg from "@/assets/cat-bracelets.jpg";
@@ -50,7 +52,9 @@ export type Product = {
     mrp?: number;
     sku: string;
   }>;
+  appliedScheme?: Scheme;
   offer?: {
+
     schemeName?: string;
     bannerText?: string;
     badgeText?: string;
