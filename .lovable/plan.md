@@ -1,35 +1,40 @@
-## Goal
+# Show POS scheme offers and offer prices on the storefront
 
-Add a luxury-styled filter sidebar to every category page (`/collections/rings`, `/earrings`, `/pendants`, `/necklaces`, `/bracelets`, `/bridal`) matching the reference: Price range, Carat, Purity, Colour, Size, and Shop For (Her / Him). Nothing in cart, checkout, product pages, or data fetching changes.
+Offers configured in Scheme Config Master already drive the discounted prices shown in Catalog Master. The storefront currently does not read them: it queries a `promotions` table that does not exist in the POS backend, so the offer lookup silently fails and every product shows its plain price.
 
-## Layout
+The real source is the POS `schemes` table, which is already publicly readable with the same anon key the storefront uses for the catalog. Confirmed live examples: "25% off on Rings" (category RING, 25%, capped at Rs 5,000) and "Rs 2,000 off on Earrings" (EARRING, price band Rs 15,000-75,000).
 
-Category pages become a two-column grid below the hero: sticky sidebar (approx. 260px) on the left, product grid on the right (3-up desktop, 2-up tablet). On mobile the sidebar collapses into a "Filters" button that opens a slide-in sheet, so the current mobile grid stays clean.
+## What will change for shoppers
 
-Sidebar sections are collapsible accordions with the existing serif headings, hairline dividers and uppercase eyebrow styling — same palette and typography as today, no new colours.
+- Products covered by an active scheme show the same discounted price as the POS catalog, with the original price struck through.
+- An offer ribbon with the scheme name appears on the product card, styled in the Trayi luxury palette (accent gold, not the POS red/orange), plus a "Save Rs X" line.
+- The product detail page shows the same offer name, offer price, original price, and savings.
+- No offer configured, or the scheme has expired, means the product looks exactly as it does today.
 
-## Filters
+## How offers are matched (mirrors POS exactly)
 
-- **Price** — dual number inputs plus a range slider, min 0 to the highest price in that category (computed from loaded products, exactly like the reference "The highest price is ₹569,589").
-- **Carat** — buckets (below 1 carat, 1–2, 2–3, 3 & above) derived from product tags.
-- **Purity** — 9 KT / 14 KT / 18 KT, from each product's purity options.
-- **Colour** — Yellow / White / Rose Gold, from metal options.
-- **Size** — the category's size values (ring size, length, chain length), shown only where sizes exist.
-- **Shop For** — Her / Him, derived from tags (e.g. "Ladies rings", "Mens"). This section only renders when the catalog actually has gendered tags for that category, so it never shows an empty or misleading facet.
+Port the POS scheme evaluation logic so both apps agree on price:
 
-Every option list is built from the products actually returned for that category, so no dead checkboxes appear. Each option shows a live match count, and a "Clear all" resets everything. A product matches price when any of its variants falls in range, so multi-price items behave correctly.
+- Scheme is honoured only when `status = 'active'` and today falls between `start_date` and `end_date`.
+- Rule types supported: `product` (specific product ids), `category`, `category_price` (category plus base-price band), `category_dia`, `category_making`, and `generic` (all products).
+- When several schemes match, the winner is the highest `priority`, tie-broken by specificity: product > category+attribute > category > generic.
+- Discount types: percentage, fixed, tiered, cashback, bundle, buy-x-get-y, second-at-discount, capped by `max_discount_amount`.
+- Discount applies to the price basis (`discount_basis`); the displayed price drops only when the basis is `product_price`, same as POS.
 
-## State in the URL
+## Technical changes
 
-Filters live in the URL as search params (`min`, `max`, `purity`, `color`, `size`, `carat`, `for`) via TanStack Router `validateSearch`, so filtered views are shareable and survive back/forward. Filtering happens client-side over the already-loaded category rows — the existing Supabase loader query is untouched.
+1. `src/lib/pos-schemes.ts` (new): typed `Scheme` shape plus a port of the POS `schemeEvaluationEngine` (`evaluateApplicableSchemes` / `calculateEffectivePrice`), unchanged in behaviour.
+2. `src/lib/remote-catalog.ts`:
+   - Replace `fetchOffers()` (dead `promotions` query) with `fetchActiveSchemes()` reading `schemes` from `posSupabase` filtered to `status = 'active'`.
+   - After mapping each row, evaluate schemes against `{ productId: row.id, productName: title, category: row.product_type, basePrice: row.base_price }` — base price, matching what the POS card uses.
+   - Populate the existing `product.offer` field with scheme name, discount amount/percent, and set an `offerPrice`; keep `price`/`mrp` semantics intact so cart and checkout logic are untouched.
+   - Apply the same in `fetchProductByHandle` and, via it, related products.
+3. `src/lib/catalog.ts`: extend the `Offer` type on `Product` with `offerPrice` and `schemeName`.
+4. `src/components/product-card.tsx`: render offer price + struck-through original + savings when an offer exists; use the existing accent ribbon slot rather than adding new hardcoded colours.
+5. `src/routes/product.$productId.tsx`: show the offer badge and offer price in the price block; when a variant is selected, apply the same scheme discount to that variant's price so detail and listing stay consistent.
 
-## Empty state
+Filters, sorting, cart, checkout, and wishlist behaviour are unchanged; the price-range filter continues to use the catalog price.
 
-When filters exclude everything, the grid shows a "No pieces match these filters" message with a Clear all action, instead of the current "New pieces arriving soon" copy (which stays for genuinely empty categories).
+## Open point
 
-## Technical notes
-
-- New `src/components/collection-filters.tsx` (sidebar UI) and `src/lib/product-filters.ts` (facet extraction + matching logic).
-- `src/lib/remote-catalog.ts` gains pass-through of `tags` onto the mapped `Product` (additive field only) so carat and gender facets have a source.
-- `src/routes/collections.$category.tsx` gets `validateSearch` plus the two-column layout; loader, head metadata, hero and `ProductCard` stay as-is.
-- Uses the existing shadcn `slider`, `checkbox`, `accordion` and `sheet` primitives.
+Cart and checkout will continue to charge the pre-offer price unless you want the discount carried through the purchase flow too. This plan covers display only; say the word and I will extend it to cart totals.
