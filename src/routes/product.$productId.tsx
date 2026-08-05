@@ -64,9 +64,16 @@ function ProductPage() {
       (!v.color || v.color === metal) &&
       (!v.size || v.size === size),
   );
-  const price = active?.price ?? product.price;
+  const listPrice = active?.price ?? product.price;
   const mrp = active?.mrp ?? product.mrp;
   const sku = active?.sku ?? product.sku;
+
+  const schemePricing = product.appliedScheme
+    ? applySchemeToPrice(product.appliedScheme, listPrice)
+    : null;
+  const hasOffer = !!schemePricing && schemePricing.discountAmount > 0;
+  const price = hasOffer ? schemePricing!.effectivePrice : listPrice;
+
 
   const addToBag = (goToCart = false) => {
     add({ productId: product.id, qty, size, metal, purity });
