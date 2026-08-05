@@ -240,5 +240,3 @@ export async function fetchRelated(
   const items = await fetchProductsByCategory(category);
   return items.filter((p) => p.id !== excludeId).slice(0, limit);
 }
-
-}
