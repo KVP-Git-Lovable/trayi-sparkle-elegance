@@ -50,6 +50,14 @@ export type Product = {
     mrp?: number;
     sku: string;
   }>;
+  offer?: {
+    bannerText?: string;
+    badgeText?: string;
+    discountAmount?: number;
+    discountPercent?: number;
+    validFrom?: string;
+    validTo?: string;
+  };
 };
 
 
