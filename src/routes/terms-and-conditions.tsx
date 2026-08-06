@@ -244,7 +244,7 @@ function TermsAndConditionsPage() {
               If you have any questions about these Terms & Conditions, please contact us:
             </p>
             <ul className="space-y-1 ml-2">
-              <li>Email: <a href="mailto:hello@trayijewellers.in" className="text-accent hover:underline">hello@trayijewellers.in</a></li>
+              <li>Email: <a href="mailto:sales.trayi@gmail.com" className="text-accent hover:underline">sales.trayi@gmail.com</a></li>
               <li>Phone: Available on request</li>
               <li>Location: Mangalore, Karnataka, India</li>
             </ul>

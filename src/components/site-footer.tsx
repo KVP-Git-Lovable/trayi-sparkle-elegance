@@ -40,7 +40,7 @@ export function SiteFooter() {
           <ul className="space-y-3 text-sm text-muted-foreground">
             <li className="flex gap-2"><MapPin className="h-4 w-4 mt-0.5 text-accent" /> Mangalore, Karnataka</li>
             <li className="flex gap-2"><Phone className="h-4 w-4 mt-0.5 text-accent" /> +91 · Available on request</li>
-            <li className="flex gap-2"><Mail className="h-4 w-4 mt-0.5 text-accent" /> hello@trayijewellers.in</li>
+            <li className="flex gap-2"><Mail className="h-4 w-4 mt-0.5 text-accent" /> sales.trayi@gmail.com</li>
             <li>
               <a
                 href="https://www.instagram.com/trayijewellers/"
