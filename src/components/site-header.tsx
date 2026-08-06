@@ -3,6 +3,7 @@ import { Search, User, ShoppingBag, Menu } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
+import headerLogo from "@/assets/trayi-header-logo.png";
 
 const nav = [
   { to: "/collections", label: "Collections" },
@@ -33,11 +34,14 @@ export function SiteHeader() {
           </button>
         </div>
 
-        <Link to="/" className="flex flex-col items-center leading-none">
-          <span className="font-display text-2xl md:text-3xl tracking-[0.2em] text-foreground">
-            TRAYI
-          </span>
-          <span className="eyebrow mt-1 text-[9px]">Lab-Grown Diamonds · Mangalore</span>
+        <Link to="/" className="flex items-center gap-3 leading-none">
+          <img src={headerLogo} alt="TRAYI" className="h-12 w-auto" />
+          <div className="flex flex-col">
+            <span className="font-display text-2xl md:text-3xl tracking-[0.2em] text-foreground">
+              TRAYI
+            </span>
+            <span className="eyebrow mt-1 text-[9px]">Lab-Grown Diamonds · Mangalore</span>
+          </div>
         </Link>
 
         <div className="flex flex-1 items-center justify-end gap-4 text-foreground/80">
