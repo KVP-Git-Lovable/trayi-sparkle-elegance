@@ -249,6 +249,43 @@ function TermsAndConditionsPage() {
               <li>Location: Mangalore, Karnataka, India</li>
             </ul>
           </section>
+
+          <section className="mt-12">
+            <h2 className="text-2xl font-display text-foreground mb-6">A Note on Jewellery Sold by the Company</h2>
+            <ul className="space-y-3 list-disc list-inside ml-2">
+              <li>
+                <p className="font-semibold text-foreground mb-2">The Company follows metric system of weights (grams). Customers are advised to refer following conversion table if required.</p>
+                <ul className="list-disc list-inside space-y-1 ml-6">
+                  <li>1 Tola = 11.650 grams</li>
+                  <li>1 Sovereign (Pavan) = 8 grams</li>
+                  <li>1 Carat = 0.200 grams</li>
+                  <li>1 Gram = 1000 milligrams.</li>
+                </ul>
+              </li>
+
+              <li>Our gold ornaments carrying the BIS Hallmark will have melting purity as specified in the Hallmark. Customer can get the purity of the Hallmarked product verified from any of the BIS recognized A&H centre. The list of BIS recognized A&H centre along with address and contact details is available on the website <a href="https://www.bis.gov.in" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">www.bis.gov.in</a>.</li>
+
+              <li>We take extreme care and caution while setting stones/gems in ornaments. Since gold is a soft metal, stones/gems which are delicate may get damaged on impact. We shall not guarantee the durability of stones/gems or its settings on physical impact. However, We will repair/reset or replace the stones/gems at the cost of customers subject to the availability of similar stones/gems.</li>
+
+              <li>The date of delivery specified in the order form is only probable date of delivery. The actual delivery date may vary as the manufacturing process is manual & artistic in nature.</li>
+
+              <li>Stones and beads etc. supplied by the customer will be accepted against custom orders at the customer's own risk.</li>
+
+              <li>For customer's specific order, rate of gold will be fixed only against full payment of gold value. Otherwise, Gold rate at the time of placing the order or delivery whichever is higher will be charged.</li>
+
+              <li>Ornaments once sold will not be accepted or exchanged free of cost on return.</li>
+
+              <li>Customers are advised to verify & note the weight, purity and specifications of the ornaments they purchase.</li>
+
+              <li>Disputes, if any, are subject to Mangalore (TRAYI Office) jurisdiction only.</li>
+
+              <li>The Management reserves the right to provide or deny services/goods to any person.</li>
+
+              <li>Govt. specified rules & taxes like GST etc. are applicable.</li>
+            </ul>
+
+            <p className="mt-6 font-semibold text-foreground">BUREAU OF INDIAN STANDARD HALLMARKED JEWELLERY</p>
+          </section>
         </div>
 
         <div className="mt-12 pt-8 border-t border-border/60 text-center">
