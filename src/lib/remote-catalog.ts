@@ -17,6 +17,21 @@ type CatalogRow = {
   tags: string[] | null;
 };
 
+export type Offer = {
+  id: string;
+  product_id?: string;
+  product_handle?: string;
+  title: string;
+  description?: string;
+  discount_amount?: number;
+  discount_percent?: number;
+  valid_from?: string;
+  valid_to?: string;
+  badge_text?: string;
+  banner_text?: string;
+  status?: string;
+};
+
 const SELECT =
   "id,handle,title,vendor,product_type,image_url,description,display_price,base_price,compare_at_price,options,variants,tags";
 
@@ -153,10 +168,27 @@ export async function fetchProductsByCategory(slug: string): Promise<Product[]> 
     .eq("status", "active")
     .order("sort_order", { ascending: true });
   if (error) throw error;
+
+  const offersMap = await fetchOffers();
   const rows = (data ?? []) as CatalogRow[];
+
   return rows
     .filter((r) => TYPE_TO_SLUG[(r.product_type ?? "").toLowerCase()] === slug)
-    .map(mapRow);
+    .map(row => {
+      const product = mapRow(row);
+      const offer = offersMap[product.id];
+      if (offer) {
+        product.offer = {
+          bannerText: offer.banner_text,
+          badgeText: offer.badge_text,
+          discountAmount: offer.discount_amount,
+          discountPercent: offer.discount_percent,
+          validFrom: offer.valid_from,
+          validTo: offer.valid_to,
+        };
+      }
+      return product;
+    });
 }
 
 export async function fetchProductByHandle(handle: string): Promise<Product | null> {
@@ -169,7 +201,25 @@ export async function fetchProductByHandle(handle: string): Promise<Product | nu
     .eq(isUuid ? "id" : "handle", handle)
     .maybeSingle();
   if (error) throw error;
-  return data ? mapRow(data as CatalogRow) : null;
+
+  if (!data) return null;
+
+  const product = mapRow(data as CatalogRow);
+  const offersMap = await fetchOffers();
+  const offer = offersMap[product.id];
+
+  if (offer) {
+    product.offer = {
+      bannerText: offer.banner_text,
+      badgeText: offer.badge_text,
+      discountAmount: offer.discount_amount,
+      discountPercent: offer.discount_percent,
+      validFrom: offer.valid_from,
+      validTo: offer.valid_to,
+    };
+  }
+
+  return product;
 }
 
 export async function fetchRelated(
@@ -179,4 +229,40 @@ export async function fetchRelated(
 ): Promise<Product[]> {
   const items = await fetchProductsByCategory(category);
   return items.filter((p) => p.id !== excludeId).slice(0, limit);
+}
+
+export async function fetchOffers(): Promise<Record<string, Offer>> {
+  try {
+    const { data, error } = await posSupabase
+      .from("promotions")
+      .select("*")
+      .eq("status", "active");
+
+    if (error) throw error;
+
+    const offersMap: Record<string, Offer> = {};
+    (data ?? []).forEach((offer: any) => {
+      const key = offer.product_handle || offer.product_id || offer.id;
+      if (key) {
+        offersMap[key] = {
+          id: offer.id,
+          product_id: offer.product_id,
+          product_handle: offer.product_handle,
+          title: offer.title || offer.name,
+          description: offer.description,
+          discount_amount: offer.discount_amount,
+          discount_percent: offer.discount_percent,
+          valid_from: offer.valid_from,
+          valid_to: offer.valid_to,
+          badge_text: offer.badge_text,
+          banner_text: offer.banner_text,
+          status: offer.status,
+        };
+      }
+    });
+    return offersMap;
+  } catch (err) {
+    console.warn("Failed to fetch offers:", err);
+    return {};
+  }
 }
