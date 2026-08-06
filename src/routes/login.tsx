@@ -38,14 +38,14 @@ function LoginPage() {
     if (!loading && user) navigate({ to: "/account", replace: true });
   }, [user, loading, navigate]);
 
-  const oauth = async (provider: "google" | "apple" | "facebook" | "instagram") => {
+  const oauth = async (provider: "google" | "apple" | "facebook") => {
     setBusy(true);
     try {
-      if (provider === "facebook" || provider === "instagram") {
+      if (provider === "facebook") {
         const { error } = await supabase.auth.signInWithOAuth({
           provider: "facebook",
           options: {
-            redirectTo: window.location.origin,
+            redirectTo: `${window.location.origin}/auth/callback`,
           },
         });
         if (error) throw error;
@@ -173,14 +173,6 @@ function LoginPage() {
                       className="w-full flex items-center justify-center gap-3 border border-input py-3 text-sm hover:border-accent hover:text-accent transition-colors disabled:opacity-50"
                     >
                       <FacebookIcon /> Continue with Facebook
-                    </button>
-                    <button
-                      type="button"
-                      disabled={busy}
-                      onClick={() => oauth("instagram")}
-                      className="w-full flex items-center justify-center gap-3 border border-input py-3 text-sm hover:border-accent hover:text-accent transition-colors disabled:opacity-50"
-                    >
-                      <InstagramIcon /> Continue with Instagram
                     </button>
                   </div>
 
