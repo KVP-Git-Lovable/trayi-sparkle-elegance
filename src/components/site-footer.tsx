@@ -38,8 +38,8 @@ export function SiteFooter() {
         <div>
           <h4 className="eyebrow mb-4">Visit</h4>
           <ul className="space-y-3 text-sm text-muted-foreground">
-            <li className="flex gap-2"><MapPin className="h-4 w-4 mt-0.5 text-accent" /> Mangalore, Karnataka</li>
-            <li className="flex gap-2"><Phone className="h-4 w-4 mt-0.5 text-accent" /> +91 · Available on request</li>
+            <li className="flex gap-2"><MapPin className="h-4 w-4 mt-0.5 text-accent" /> <div>2nd Floor, Bharath Mall, Near Jayalakshmi Silks, Bejai, Mangalore</div></li>
+            <li className="flex gap-2"><Phone className="h-4 w-4 mt-0.5 text-accent" /> +91 · 8971783030</li>
             <li className="flex gap-2"><Mail className="h-4 w-4 mt-0.5 text-accent" /> sales.trayi@gmail.com</li>
             <li>
               <a
