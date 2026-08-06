@@ -32,9 +32,9 @@ function ContactPage() {
           </p>
 
           <ul className="mt-10 space-y-5 text-sm">
-            <li className="flex gap-3"><MapPin className="h-4 w-4 mt-1 text-accent shrink-0" /><span>Mangalore, Karnataka, India<br /><span className="text-muted-foreground">Address available on appointment</span></span></li>
-            <li className="flex gap-3"><Phone className="h-4 w-4 mt-1 text-accent shrink-0" /><span>+91 · Available on request</span></li>
-            <li className="flex gap-3"><Mail className="h-4 w-4 mt-1 text-accent shrink-0" /><span>hello@trayijewellers.in</span></li>
+            <li className="flex gap-3"><MapPin className="h-4 w-4 mt-1 text-accent shrink-0" /><span>2nd Floor, Bharath Mall, Near Jayalakshmi Silks, Bejai, Mangalore</span></li>
+            <li className="flex gap-3"><Phone className="h-4 w-4 mt-1 text-accent shrink-0" /><span>+91 · 8971783030</span></li>
+            <li className="flex gap-3"><Mail className="h-4 w-4 mt-1 text-accent shrink-0" /><span>sales.trayi@gmail.com</span></li>
             <li className="flex gap-3"><Clock className="h-4 w-4 mt-1 text-accent shrink-0" /><span>Open daily · 10:30 AM – 8:30 PM</span></li>
             <li className="flex gap-3"><Instagram className="h-4 w-4 mt-1 text-accent shrink-0" /><a href="https://www.instagram.com/trayijewellers/" target="_blank" rel="noopener noreferrer" className="hover:text-accent">@trayijewellers</a></li>
           </ul>
