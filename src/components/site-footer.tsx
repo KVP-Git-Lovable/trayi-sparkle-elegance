@@ -1,13 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Mail, Phone, MapPin } from "lucide-react";
-import logoSvg from "@/assets/trayi-logo.svg";
+import logoPng from "@/assets/trayi-logo.png";
 
 export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-border/60 bg-secondary/40">
       <div className="mx-auto max-w-7xl px-6 py-16 grid gap-12 md:grid-cols-4">
         <div>
-          <img src={logoSvg} alt="TRAYI" className="h-16 w-auto mb-2" />
+          <img src={logoPng} alt="TRAYI Eternal jewellery" className="h-16 w-auto mb-2" />
           <p className="eyebrow mt-2 text-[10px]">Lab-Grown Diamonds</p>
           <p className="mt-6 text-sm text-muted-foreground leading-relaxed">
             Mangalore's exclusive destination for LimeLight lab-grown diamond
