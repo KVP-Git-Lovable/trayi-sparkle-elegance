@@ -8,6 +8,7 @@ import bridalImg from "@/assets/cat-bridal.jpg";
 import heroImg from "@/assets/hero-main.jpg";
 import bannerImg from "@/assets/collection-banner.jpg";
 import educationImg from "@/assets/education-lab.jpg";
+import necklaceImg from "@/assets/image-1786103498000.png";
 
 export type Category = {
   slug: string;
@@ -20,7 +21,7 @@ export const categories: Category[] = [
   { slug: "rings", name: "Rings", tagline: "Solitaires, bands & statement rings", image: ringImg },
   { slug: "earrings", name: "Earrings", tagline: "Studs, drops & chandeliers", image: earringImg },
   { slug: "pendants", name: "Pendants", tagline: "Everyday brilliance", image: pendantImg },
-  { slug: "necklaces", name: "Necklaces", tagline: "Diamond lines for the collarbone", image: educationImg },
+  { slug: "necklaces", name: "Necklaces", tagline: "Diamond lines for the collarbone", image: necklaceImg },
   { slug: "bracelets", name: "Bracelets", tagline: "Tennis & delicate lines", image: braceletImg },
   { slug: "bridal", name: "Bridal", tagline: "Heirlooms for your forever", image: bridalImg },
 ];
