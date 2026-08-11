@@ -98,11 +98,44 @@ function mapRow(row: CatalogRow): Product {
     ["14 KT", "18 KT"];
   const sizes = pickOption(row.options, ["Size", "Ring Size", "Length"]);
 
+  // Map option names to their positions (Shopify stores options as option1, option2, option3)
+  const optionNames = Object.keys(row.options ?? {});
+  const colorOptionKey = optionNames.find((key) =>
+    ["Color", "Colour", "Metal", "Metal Colour"].some(
+      (name) => key.toLowerCase() === name.toLowerCase(),
+    ),
+  );
+  const purityOptionKey = optionNames.find((key) =>
+    ["Purity", "Karat", "Metal Purity"].some(
+      (name) => key.toLowerCase() === name.toLowerCase(),
+    ),
+  );
+  const sizeOptionKey = optionNames.find((key) =>
+    ["Size", "Ring Size", "Length"].some(
+      (name) => key.toLowerCase() === name.toLowerCase(),
+    ),
+  );
+
   const rawVariants = (row.variants ?? []) as Array<Record<string, unknown>>;
   const variants = rawVariants.map((v) => ({
-    size: v.size != null ? String(v.size) : undefined,
-    color: v.color != null ? String(v.color) : undefined,
-    purity: v.purity != null ? String(v.purity) : undefined,
+    size:
+      sizeOptionKey && v[sizeOptionKey] != null
+        ? String(v[sizeOptionKey])
+        : v.size != null
+          ? String(v.size)
+          : undefined,
+    color:
+      colorOptionKey && v[colorOptionKey] != null
+        ? String(v[colorOptionKey])
+        : v.color != null
+          ? String(v.color)
+          : undefined,
+    purity:
+      purityOptionKey && v[purityOptionKey] != null
+        ? String(v[purityOptionKey])
+        : v.purity != null
+          ? String(v.purity)
+          : undefined,
     price: Number(v.price) || 0,
     mrp:
       v.compare_at_price != null && Number(v.compare_at_price) > 0
