@@ -104,25 +104,29 @@ function mapRow(row: CatalogRow): Product {
   );
 
   const rawVariants = (row.variants ?? []) as Array<Record<string, unknown>>;
+
+  // Variant rows may key attributes by the option name ("Karat"), a lowercase
+  // form ("karat"), or a synonym ("purity"/"metal"). Resolve case-insensitively
+  // across every candidate so a naming mismatch never silently drops a facet.
+  const readAttr = (
+    v: Record<string, unknown>,
+    optionKey: string | undefined,
+    aliases: string[],
+  ): string | undefined => {
+    const wanted = [optionKey, ...aliases].filter(Boolean).map((k) => (k as string).toLowerCase());
+    for (const key of Object.keys(v)) {
+      if (wanted.includes(key.toLowerCase())) {
+        const val = v[key];
+        if (val != null && String(val).trim() !== "") return String(val);
+      }
+    }
+    return undefined;
+  };
+
   const variants = rawVariants.map((v) => ({
-    size:
-      sizeOptionKey && v[sizeOptionKey] != null
-        ? String(v[sizeOptionKey])
-        : v.size != null
-          ? String(v.size)
-          : undefined,
-    color:
-      colorOptionKey && v[colorOptionKey] != null
-        ? String(v[colorOptionKey])
-        : v.color != null
-          ? String(v.color)
-          : undefined,
-    purity:
-      purityOptionKey && v[purityOptionKey] != null
-        ? String(v[purityOptionKey])
-        : v.purity != null
-          ? String(v.purity)
-          : undefined,
+    size: readAttr(v, sizeOptionKey, ["size", "ring size", "length", "option1"]),
+    color: readAttr(v, colorOptionKey, ["color", "colour", "metal", "metal colour", "option2"]),
+    purity: readAttr(v, purityOptionKey, ["purity", "karat", "carat", "metal purity", "option3"]),
     price: Number(v.price) || 0,
     mrp:
       v.compare_at_price != null && Number(v.compare_at_price) > 0
