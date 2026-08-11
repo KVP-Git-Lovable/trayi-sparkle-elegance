@@ -60,12 +60,16 @@ function ProductPage() {
   const [size, setSize] = useState(product.sizes?.[0]);
   const [qty, setQty] = useState(1);
 
-  const active = product.variants?.find(
-    (v) =>
-      (!v.purity || v.purity === purity) &&
-      (!v.color || v.color === metal) &&
-      (!v.size || v.size === size),
-  );
+  // Normalised compare so "14 KT" / "14K" style differences never break matching.
+  const norm = (v?: string) => (v ?? "").toLowerCase().replace(/[\s.]/g, "");
+  const eq = (a?: string, b?: string) => !a || !b || norm(a) === norm(b);
+  const variants = product.variants ?? [];
+  const active =
+    variants.find(
+      (v) => eq(v.purity, purity) && eq(v.color, metal) && eq(v.size, size),
+    ) ??
+    variants.find((v) => eq(v.purity, purity) && eq(v.color, metal)) ??
+    variants.find((v) => eq(v.purity, purity));
   const listPrice = active?.price ?? product.price;
   const mrp = active?.mrp ?? product.mrp;
   const sku = active?.sku ?? product.sku;
