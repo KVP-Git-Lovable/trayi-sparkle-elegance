@@ -4,9 +4,9 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { useCart, itemProduct } from "@/lib/cart";
 import { formatINR } from "@/lib/catalog";
-import { POS_URL, POS_ANON_KEY } from "@/lib/pos-supabase";
 import { Store, Truck, ShieldCheck, Lock } from "lucide-react";
 import { toast } from "sonner";
+import { createOnlineOrder } from "@/lib/storehaven-api";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -50,79 +50,72 @@ function CheckoutPage() {
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const s = (k: string) => String(fd.get(k) ?? "").trim();
+    setPlacing(true);
 
-    const lineItems = items
-      .map((it) => {
+    try {
+      const formData = new FormData(e.currentTarget);
+      const name = formData.get("name") as string;
+      const email = formData.get("email") as string;
+      const phone = formData.get("phone") as string;
+      const address1 = formData.get("address1") as string;
+      const address2 = formData.get("address2") as string;
+      const city = formData.get("city") as string;
+      const state = formData.get("state") as string;
+      const pincode = formData.get("pincode") as string;
+      const pickupDate = formData.get("pickup_date") as string;
+
+      // Build items array from cart
+      const orderItems = items.map((it) => {
         const p = itemProduct(it);
-        if (!p) return null;
         return {
           productId: it.productId,
-          name: p.name,
-          sku: it.productSku ?? p.sku,
-          quantity: it.qty,
-          unitPrice: p.price,
-          lineTotal: p.price * it.qty,
-          size: it.size,
-          metal: it.metal,
+          name: p?.name || it.productName || "Product",
+          price: it.productPrice || 0,
+          qty: it.qty,
           purity: it.purity,
+          metal: it.metal,
+          size: it.size,
         };
-      })
-      .filter(Boolean);
-
-    if (lineItems.length === 0) {
-      toast.error("Your bag is empty");
-      return;
-    }
-
-    setPlacing(true);
-    try {
-      const res = await fetch(`${POS_URL.replace(".supabase.co", ".functions.supabase.co")}/create_online_order`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: POS_ANON_KEY,
-          Authorization: `Bearer ${POS_ANON_KEY}`,
-        },
-        body: JSON.stringify({
-          customerName: s("name"),
-          customerEmail: s("email"),
-          customerPhone: s("phone"),
-          fulfillmentMethod: fulfilment,
-          paymentMethod: pay,
-          ...(fulfilment === "delivery"
-            ? {
-                shippingAddress: {
-                  line1: s("address1"),
-                  line2: s("address2"),
-                  city: s("city"),
-                  state: s("state"),
-                  pincode: s("pincode"),
-                },
-              }
-            : { preferredPickupDate: s("pickup_date") }),
-          items: lineItems,
-          subtotal,
-          totalAmount: subtotal,
-        }),
       });
 
-      const data = await res.json().catch(() => null as any);
-      if (!res.ok || !data?.orderNumber) {
-        throw new Error(data?.error || "Order could not be placed");
-      }
+      // Call API to create order in storehaven-essentials
+      const result = await createOnlineOrder({
+        customerName: name,
+        customerEmail: email,
+        customerPhone: phone,
+        fulfillmentMethod: fulfilment,
+        shippingAddress:
+          fulfilment === "delivery"
+            ? {
+                line1: address1,
+                line2: address2,
+                city,
+                state,
+                pincode,
+              }
+            : undefined,
+        preferredPickupDate: fulfilment === "pickup" ? pickupDate : undefined,
+        items: orderItems,
+        subtotal,
+        totalAmount: subtotal,
+      });
 
-      clear();
-      toast.success("Order placed successfully");
-      navigate({ to: "/order-confirmation", search: { order: data.orderNumber, mode: fulfilment } });
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Order could not be placed. Please try again.");
+      if (result.success) {
+        clear();
+        toast.success("Order placed successfully");
+        navigate({
+          to: "/order-confirmation",
+          search: { order: result.order.orderNumber, mode: fulfilment },
+        });
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to create order";
+      console.error("Checkout error:", error);
+      toast.error(message || "Failed to place order. Please try again.");
     } finally {
       setPlacing(false);
     }
   };
-
 
   return (
     <div className="min-h-screen">
