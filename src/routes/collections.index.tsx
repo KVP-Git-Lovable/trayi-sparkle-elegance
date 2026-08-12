@@ -28,21 +28,21 @@ function CollectionsIndex() {
           piece is set with certified lab-grown diamonds from LimeLight.
         </p>
       </section>
-      <section className="mx-auto max-w-7xl px-6 pb-24 grid gap-6 md:grid-cols-2">
-        {categories.map((c, i) => (
+      <section className="mx-auto max-w-7xl px-6 pb-24 grid gap-3 md:grid-cols-3 lg:grid-cols-4">
+        {categories.map((c) => (
           <Link
             key={c.slug}
             to="/collections/$category"
             params={{ category: c.slug }}
-            className={`group relative overflow-hidden ${i === 0 ? "md:col-span-2" : ""}`}
+            className="group relative overflow-hidden"
           >
-            <div className={`overflow-hidden ${i === 0 ? "aspect-[16/8]" : "aspect-[4/5]"}`}>
+            <div className="overflow-hidden aspect-[3/4]">
               <img src={c.image} alt={c.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent" />
-            <div className="absolute bottom-8 left-8 text-background">
-              <span className="text-[10px] uppercase tracking-[0.28em] opacity-80">{c.tagline}</span>
-              <h2 className="mt-2 font-display text-3xl md:text-4xl">{c.name}</h2>
+            <div className="absolute bottom-4 left-4 text-background">
+              <span className="text-[8px] uppercase tracking-[0.22em] opacity-80">{c.tagline}</span>
+              <h2 className="mt-1 font-display text-base md:text-lg">{c.name}</h2>
             </div>
           </Link>
         ))}
