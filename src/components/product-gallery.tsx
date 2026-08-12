@@ -4,9 +4,11 @@ import { ChevronLeft, ChevronRight, ZoomIn, X } from "lucide-react";
 type Props = {
   images: string[];
   alt: string;
+  /** Shown if a derived (colour-swapped) image fails to load. */
+  fallbackSrc?: string;
 };
 
-export function ProductGallery({ images, alt }: Props) {
+export function ProductGallery({ images, alt, fallbackSrc }: Props) {
   const [index, setIndex] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const [zoom, setZoom] = useState(false);
