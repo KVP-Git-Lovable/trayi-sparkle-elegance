@@ -66,8 +66,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const count = items.reduce((s, i) => s + i.qty, 0);
   const subtotal = items.reduce((s, i) => {
-    const p = getProduct(i.productId);
-    return s + (p ? p.price * i.qty : 0);
+    // Use stored productPrice from cart item (works for both local and remote products)
+    const price = i.productPrice ?? (() => {
+      const p = getProduct(i.productId);
+      return p ? p.price : 0;
+    })();
+    return s + (price * i.qty);
   }, 0);
 
   return (
