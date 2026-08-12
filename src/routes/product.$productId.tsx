@@ -1,11 +1,12 @@
 import { createFileRoute, notFound, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { ProductGallery } from "@/components/product-gallery";
 import { formatINR, type Product } from "@/lib/catalog";
 import { applySchemeToPrice } from "@/lib/pos-schemes";
+import { resolveColorImage } from "@/lib/metal-image";
 
 import { fetchProductByHandle, fetchRelated } from "@/lib/remote-catalog";
 import { useCart } from "@/lib/cart";
