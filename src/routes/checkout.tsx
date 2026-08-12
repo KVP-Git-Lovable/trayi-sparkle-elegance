@@ -6,6 +6,7 @@ import { useCart, itemProduct } from "@/lib/cart";
 import { formatINR } from "@/lib/catalog";
 import { Store, Truck, ShieldCheck, Lock } from "lucide-react";
 import { toast } from "sonner";
+import { createOnlineOrder } from "@/lib/storehaven-api";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -47,15 +48,73 @@ function CheckoutPage() {
     );
   }
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setPlacing(true);
-    setTimeout(() => {
-      const orderId = "TR" + Math.random().toString(36).slice(2, 8).toUpperCase();
-      clear();
-      toast.success("Order placed successfully");
-      navigate({ to: "/order-confirmation", search: { order: orderId, mode: fulfilment } });
-    }, 900);
+
+    try {
+      const formData = new FormData(e.currentTarget);
+      const name = formData.get("name") as string;
+      const email = formData.get("email") as string;
+      const phone = formData.get("phone") as string;
+      const address1 = formData.get("address1") as string;
+      const address2 = formData.get("address2") as string;
+      const city = formData.get("city") as string;
+      const state = formData.get("state") as string;
+      const pincode = formData.get("pincode") as string;
+      const pickupDate = formData.get("pickup_date") as string;
+
+      // Build items array from cart
+      const orderItems = items.map((it) => {
+        const p = itemProduct(it);
+        return {
+          productId: it.productId,
+          name: p?.name || it.productName || "Product",
+          price: it.productPrice || 0,
+          qty: it.qty,
+          purity: it.purity,
+          metal: it.metal,
+          size: it.size,
+        };
+      });
+
+      // Call API to create order in storehaven-essentials
+      const result = await createOnlineOrder({
+        customerName: name,
+        customerEmail: email,
+        customerPhone: phone,
+        fulfillmentMethod: fulfilment,
+        shippingAddress:
+          fulfilment === "delivery"
+            ? {
+                line1: address1,
+                line2: address2,
+                city,
+                state,
+                pincode,
+              }
+            : undefined,
+        preferredPickupDate: fulfilment === "pickup" ? pickupDate : undefined,
+        items: orderItems,
+        subtotal,
+        totalAmount: subtotal,
+      });
+
+      if (result.success) {
+        clear();
+        toast.success("Order placed successfully");
+        navigate({
+          to: "/order-confirmation",
+          search: { order: result.order.orderNumber, mode: fulfilment },
+        });
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to create order";
+      console.error("Checkout error:", error);
+      toast.error(message || "Failed to place order. Please try again.");
+    } finally {
+      setPlacing(false);
+    }
   };
 
   return (
