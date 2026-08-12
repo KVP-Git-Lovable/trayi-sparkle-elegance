@@ -1,11 +1,12 @@
 import { createFileRoute, notFound, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { ProductGallery } from "@/components/product-gallery";
 import { formatINR, type Product } from "@/lib/catalog";
 import { applySchemeToPrice } from "@/lib/pos-schemes";
+import { resolveColorImage } from "@/lib/metal-image";
 
 import { fetchProductByHandle, fetchRelated } from "@/lib/remote-catalog";
 import { useCart } from "@/lib/cart";
@@ -79,6 +80,23 @@ function ProductPage() {
     : null;
   const hasOffer = !!schemePricing && schemePricing.discountAmount > 0;
   const price = hasOffer ? schemePricing!.effectivePrice : listPrice;
+
+  // Colour-aware imagery: derive the selected metal's photo, keep default until verified.
+  const [colorImage, setColorImage] = useState(product.image);
+  useEffect(() => {
+    let cancelled = false;
+    setColorImage(product.image);
+    resolveColorImage(product.image, metal).then((src) => {
+      if (!cancelled) setColorImage(src);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [product.image, metal]);
+
+  const galleryImages = (product.gallery.length ? product.gallery : [product.image]).map(
+    (g, i) => (i === 0 ? colorImage : g),
+  );
 
 
   const addToBag = (goToCart = false) => {
@@ -154,7 +172,11 @@ function ProductPage() {
       {/* Product */}
       <section className="mx-auto max-w-7xl px-6 py-12 grid gap-12 md:grid-cols-2">
         {/* Gallery */}
-        <ProductGallery images={product.gallery.length ? product.gallery : [product.image]} alt={product.name} />
+        <ProductGallery
+          images={galleryImages}
+          alt={product.name}
+          fallbackSrc={product.image}
+        />
 
         {/* Info */}
         <div>
