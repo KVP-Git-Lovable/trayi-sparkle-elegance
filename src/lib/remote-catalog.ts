@@ -22,7 +22,7 @@ type CatalogRow = {
 const SELECT =
   "id,handle,title,vendor,product_type,image_url,description,display_price,base_price,compare_at_price,options,variants,tags";
 
-// product_type (from Shopify export) → Lumina category slug
+// product_type (from POS catalog) → storefront category slug
 const TYPE_TO_SLUG: Record<string, string> = {
   rings: "rings",
   ring: "rings",
@@ -34,27 +34,52 @@ const TYPE_TO_SLUG: Record<string, string> = {
   necklace: "necklaces",
   bracelets: "bracelets",
   bracelet: "bracelets",
-  bridal: "bridal",
   "mangalsutra bracelets": "bracelets",
+  tanmaniya: "tanmaniya",
+  "nose pin": "nose-pins",
+  "nose pins": "nose-pins",
+  "gold ring": "gold-rings",
+  "gold rings": "gold-rings",
+  "gold earring": "gold-earrings",
+  "gold earrings": "gold-earrings",
+  "gold pendant": "gold-pendants",
+  "gold pendants": "gold-pendants",
+  "gold necklace": "gold-necklaces",
+  "gold necklaces": "gold-necklaces",
+  "gold bracelet": "gold-bracelets",
+  "gold bracelets": "gold-bracelets",
 };
 
-const SLUG_TO_TYPES: Record<string, string[]> = {
-  rings: ["Rings", "Ring"],
-  earrings: ["Earrings", "Earring"],
-  pendants: ["Pendants", "Pendant"],
-  necklaces: ["Necklaces", "Necklace"],
-  bracelets: ["Bracelets", "Bracelet", "Mangalsutra Bracelets"],
-  bridal: ["Bridal"],
-};
+/** Slug for a POS product_type; unmapped types fall back to a kebab slug so
+ *  new POS categories surface instead of silently disappearing. */
+const warnedTypes = new Set<string>();
+function slugForType(productType: string | null | undefined): string {
+  const key = (productType ?? "").trim().toLowerCase();
+  if (!key) return "collections";
+  const mapped = TYPE_TO_SLUG[key];
+  if (mapped) return mapped;
+  if (!warnedTypes.has(key)) {
+    warnedTypes.add(key);
+    console.warn(`Unmapped POS product_type "${productType}" — add it to TYPE_TO_SLUG.`);
+  }
+  return key.replace(/\s+/g, "-");
+}
 
 const SIZE_LABEL: Record<string, string> = {
   rings: "Ring Size",
+  "gold-rings": "Ring Size",
   bracelets: "Length",
+  "gold-bracelets": "Length",
   earrings: "Size",
+  "gold-earrings": "Size",
+  "nose-pins": "Size",
   pendants: "Chain Length",
+  "gold-pendants": "Chain Length",
   necklaces: "Chain Length",
-  bridal: "Size",
+  "gold-necklaces": "Chain Length",
+  tanmaniya: "Chain Length",
 };
+
 
 const stripHtml = (s: string | null | undefined) =>
   (s ?? "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
@@ -74,8 +99,8 @@ const pickOption = (
 };
 
 function mapRow(row: CatalogRow): Product {
-  const slug =
-    TYPE_TO_SLUG[(row.product_type ?? "").toLowerCase()] ?? "collections";
+  const slug = slugForType(row.product_type);
+
 
   const metalOptions =
     pickOption(row.options, ["Color", "Colour", "Metal", "Metal Colour"]) ??
@@ -246,7 +271,7 @@ export async function fetchProductsByCategory(slug: string): Promise<Product[]> 
   const rows = (data ?? []) as CatalogRow[];
 
   return rows
-    .filter((r) => TYPE_TO_SLUG[(r.product_type ?? "").toLowerCase()] === slug)
+    .filter((r) => slugForType(r.product_type) === slug)
     .map((row) => applySchemes(mapRow(row), row, schemes));
 }
 

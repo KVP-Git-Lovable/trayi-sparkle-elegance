@@ -5,6 +5,13 @@ import earringImg from "@/assets/cat-earrings.jpg";
 import pendantImg from "@/assets/cat-pendants.jpg";
 import braceletImg from "@/assets/cat-bracelets.jpg";
 import bridalImg from "@/assets/cat-bridal.jpg";
+import goldRingImg from "@/assets/cat-gold-rings.jpg";
+import goldEarringImg from "@/assets/cat-gold-earrings.jpg";
+import goldPendantImg from "@/assets/cat-gold-pendants.jpg";
+import goldNecklaceImg from "@/assets/cat-gold-necklaces.jpg";
+import goldBraceletImg from "@/assets/cat-gold-bracelets.jpg";
+import tanmaniyaImg from "@/assets/cat-tanmaniya.jpg";
+import nosePinImg from "@/assets/cat-nose-pins.jpg";
 import heroImg from "@/assets/hero-main.jpg";
 import bannerImg from "@/assets/collection-banner.jpg";
 import educationImg from "@/assets/education-lab.jpg";
@@ -23,8 +30,15 @@ export const categories: Category[] = [
   { slug: "pendants", name: "Pendants", tagline: "Everyday brilliance", image: pendantImg },
   { slug: "necklaces", name: "Necklaces", tagline: "Diamond lines for the collarbone", image: necklaceImg },
   { slug: "bracelets", name: "Bracelets", tagline: "Tennis & delicate lines", image: braceletImg },
-  { slug: "bridal", name: "Bridal", tagline: "Heirlooms for your forever", image: bridalImg },
+  { slug: "tanmaniya", name: "Tanmaniya", tagline: "Mangalsutra pendants, quietly sacred", image: tanmaniyaImg },
+  { slug: "gold-rings", name: "Gold Rings", tagline: "Pure gold, timeless bands", image: goldRingImg },
+  { slug: "gold-earrings", name: "Gold Earrings", tagline: "Jhumkas, hoops & studs in gold", image: goldEarringImg },
+  { slug: "gold-pendants", name: "Gold Pendants", tagline: "Everyday gold, elegantly worn", image: goldPendantImg },
+  { slug: "gold-necklaces", name: "Gold Necklaces", tagline: "Heirloom gold for the collarbone", image: goldNecklaceImg },
+  { slug: "gold-bracelets", name: "Gold Bracelets", tagline: "Bangles & bracelets in pure gold", image: goldBraceletImg },
+  { slug: "nose-pins", name: "Nose Pins", tagline: "The smallest, brightest detail", image: nosePinImg },
 ];
+
 
 export type Product = {
   id: string;

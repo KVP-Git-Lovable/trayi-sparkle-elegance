@@ -7,7 +7,7 @@ export const Route = createFileRoute("/collections/")({
   head: () => ({
     meta: [
       { title: "Collections — Trayi Jewellery" },
-      { name: "description", content: "Explore Trayi's full range of LimeLight lab-grown diamond rings, earrings, pendants, bracelets and bridal jewellery." },
+      { name: "description", content: "Explore Trayi's full range of LimeLight lab-grown diamond diamond and gold rings, earrings, pendants, necklaces, bracelets, tanmaniya and nose pins." },
       { property: "og:title", content: "Collections — Trayi Jewellery" },
       { property: "og:description", content: "Explore Trayi's full range of LimeLight lab-grown diamond jewellery." },
     ],
@@ -24,7 +24,7 @@ function CollectionsIndex() {
         <h1 className="mt-4 font-display text-5xl md:text-6xl">Every occasion, considered</h1>
         <span className="hairline mt-6" />
         <p className="mt-6 max-w-xl mx-auto text-muted-foreground">
-          From daily elegance to once-in-a-lifetime bridal ensembles — each
+          From daily elegance to once-in-a-lifetime ceremonial pieces — each
           piece is set with certified lab-grown diamonds from LimeLight.
         </p>
       </section>

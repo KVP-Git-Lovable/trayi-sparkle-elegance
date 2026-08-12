@@ -35,7 +35,7 @@ export function ProductCard({ product }: { product: Product }) {
             {offer?.schemeName ?? "Special offer"}
           </div>
         ) : (
-          product.mrp && (
+          discountPercent > 0 && (
             <span className="absolute left-3 top-3 z-10 bg-accent px-2 py-1 text-[9px] uppercase tracking-[0.2em] text-accent-foreground font-semibold">
               {discountPercent}% Off
             </span>

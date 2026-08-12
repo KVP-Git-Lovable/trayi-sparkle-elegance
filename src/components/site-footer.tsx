@@ -19,7 +19,7 @@ export function SiteFooter() {
           <h4 className="eyebrow mb-4">Explore</h4>
           <ul className="space-y-2 text-sm">
             <li><Link to="/collections" className="hover:text-accent">All Collections</Link></li>
-            <li><Link to="/collections/bridal" className="hover:text-accent">Bridal</Link></li>
+            <li><Link to="/collections/$category" params={{ category: "tanmaniya" }} className="hover:text-accent">Tanmaniya</Link></li>
             <li><Link to="/education" className="hover:text-accent">Lab-Grown Diamonds 101</Link></li>
             <li><Link to="/about" className="hover:text-accent">Our Story</Link></li>
           </ul>
