@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { useCart, itemProduct } from "@/lib/cart";
 import { formatINR } from "@/lib/catalog";
+import { POS_URL, POS_ANON_KEY } from "@/lib/pos-supabase";
 import { Store, Truck, ShieldCheck, Lock } from "lucide-react";
 import { toast } from "sonner";
 
