@@ -5,7 +5,7 @@ import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import headerLogo from "@/assets/trayi-header-logo.png";
 
-const nav = [
+const nav: Array<{ to: string; params?: Record<string, string>; label: string }> = [
   { to: "/collections", label: "Collections" },
   { to: "/collections/$category", params: { category: "tanmaniya" }, label: "Tanmaniya" },
   { to: "/education", label: "Lab-Grown Diamonds" },
@@ -66,9 +66,10 @@ export function SiteHeader() {
       <nav className="hidden md:block border-t border-border/60">
         <ul className="mx-auto flex max-w-7xl items-center justify-center gap-10 px-6 py-3 text-[12px] font-medium uppercase tracking-[0.22em] text-foreground/70">
           {nav.map((n) => (
-            <li key={n.to}>
+            <li key={n.label}>
               <Link
                 to={n.to}
+                params={n.params as never}
                 activeProps={{ className: "text-accent" }}
                 className="hover:text-accent transition-colors"
               >
@@ -83,9 +84,10 @@ export function SiteHeader() {
         <nav className="md:hidden border-t border-border/60 bg-background">
           <ul className="flex flex-col px-6 py-4 text-sm">
             {nav.map((n) => (
-              <li key={n.to}>
+              <li key={n.label}>
                 <Link
                   to={n.to}
+                  params={n.params as never}
                   onClick={() => setOpen(false)}
                   className="block py-3 border-b border-border/40 uppercase tracking-[0.2em] text-[12px]"
                 >
