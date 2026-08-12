@@ -6,6 +6,7 @@ export interface OnlineOrderItem {
   purity?: string;
   metal?: string;
   size?: string;
+  productCode?: string;
 }
 
 export interface ShippingAddress {

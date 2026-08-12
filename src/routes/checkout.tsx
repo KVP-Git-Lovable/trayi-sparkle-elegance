@@ -75,6 +75,7 @@ function CheckoutPage() {
           purity: it.purity,
           metal: it.metal,
           size: it.size,
+          productCode: it.productCode,
         };
       });
 
@@ -233,7 +234,7 @@ function CheckoutPage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm truncate">{p.name}</p>
                       <p className="text-[11px] text-muted-foreground truncate">
-                        {[it.purity, it.metal, it.size && `Sz ${it.size}`].filter(Boolean).join(" · ")} · Qty {it.qty}
+                        {it.productCode && `${it.productCode} · `}{[it.purity, it.metal, it.size && `Sz ${it.size}`].filter(Boolean).join(" · ")} · Qty {it.qty}
                       </p>
                     </div>
                     <p className="text-sm">{formatINR(p.price * it.qty)}</p>

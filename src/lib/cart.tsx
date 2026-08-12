@@ -11,6 +11,7 @@ export type CartItem = {
   productImage?: string;
   productSku?: string;
   productPrice?: number;
+  productCode?: string;
 };
 
 type CartCtx = {
