@@ -99,8 +99,8 @@ const pickOption = (
 };
 
 function mapRow(row: CatalogRow): Product {
-  const slug =
-    TYPE_TO_SLUG[(row.product_type ?? "").toLowerCase()] ?? "collections";
+  const slug = slugForType(row.product_type);
+
 
   const metalOptions =
     pickOption(row.options, ["Color", "Colour", "Metal", "Metal Colour"]) ??
