@@ -57,7 +57,6 @@ export function colorCodeCandidates(url: string, colorName: string): string[] {
 
   const q = query ? `?${query}` : "";
   const out: string[] = [];
-  const out: string[] = [];
   const push = (name: string) => {
     for (const suffix of q ? [q, ""] : [""]) {
       const full = `${dir}${name}${suffix}`;
