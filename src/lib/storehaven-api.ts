@@ -38,17 +38,22 @@ export interface OnlineOrderResponse {
   };
 }
 
-const STOREHAVEN_API_URL = import.meta.env.VITE_STOREHAVEN_API_URL || "https://storehaven-essentials.lovable.app";
+import { POS_ANON_KEY } from "./pos-supabase";
+
+const ORDER_ENDPOINT = "https://pdtasnfsdnfttayxibqy.functions.supabase.co/create_online_order";
 
 export async function createOnlineOrder(payload: CreateOnlineOrderPayload): Promise<OnlineOrderResponse> {
   try {
-    const response = await fetch(`${STOREHAVEN_API_URL}/functions/v1/create_online_order`, {
+    const response = await fetch(ORDER_ENDPOINT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        apikey: POS_ANON_KEY,
+        Authorization: `Bearer ${POS_ANON_KEY}`,
       },
       body: JSON.stringify(payload),
     });
+
 
     if (!response.ok) {
       const errorData = await response.json();
