@@ -57,15 +57,16 @@ export function colorCodeCandidates(url: string, colorName: string): string[] {
 
   const q = query ? `?${query}` : "";
   const out: string[] = [];
+  const out: string[] = [];
   const push = (name: string) => {
-    const full = `${dir}${name}${q}`;
-    if (full !== url && !out.includes(full)) out.push(full);
+    for (const suffix of q ? [q, ""] : [""]) {
+      const full = `${dir}${name}${suffix}`;
+      if (full !== url && !out.includes(full)) out.push(full);
+    }
   };
 
   for (const code of CODES[metal]) {
-    if (code === currentCode && digits) {
-      // same code family — nothing to swap
-    }
+    if (code === currentCode && !digits) continue;
     for (const d of digits ? [digits, ""] : [""]) {
       // keep the original trailing hash first, then the plain form
       if (trailing) push(`${before}_${code}${d}${trailing}${ext}`);
@@ -74,6 +75,7 @@ export function colorCodeCandidates(url: string, colorName: string): string[] {
   }
   return out;
 }
+
 
 const cache = new Map<string, string>();
 
