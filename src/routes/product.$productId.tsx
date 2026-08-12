@@ -51,10 +51,37 @@ export const Route = createFileRoute("/product/$productId")({
   ),
 });
 
+function extractProductCode(imageUrl?: string): string | null {
+  if (!imageUrl) return null;
+
+  try {
+    const url = new URL(imageUrl);
+    const pathname = url.pathname;
+    const lastSegment = pathname.split('/').pop();
+
+    if (!lastSegment) return null;
+
+    // Remove query string and file extension
+    let code = lastSegment.split('?')[0].split('.')[0];
+
+    // Remove trailing UUID pattern (_<uuid>)
+    code = code.replace(/_[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i, '');
+
+    // Remove trailing color tokens (_Y1, _R1, _W1, etc.)
+    code = code.replace(/_[A-Z]\d+$/, '');
+
+    return code && code.length > 0 ? code : null;
+  } catch {
+    return null;
+  }
+}
+
 function ProductPage() {
   const { product, related } = Route.useLoaderData() as { product: Product; related: Product[] };
   const navigate = useNavigate();
   const { add } = useCart();
+
+  const productCode = extractProductCode(product.image);
 
   const [purity, setPurity] = useState(product.purityOptions[0]);
   const [metal, setMetal] = useState(product.metalOptions[0]);
@@ -182,6 +209,9 @@ function ProductPage() {
         <div>
           <span className="eyebrow">{product.category}</span>
           <h1 className="mt-3 font-display text-4xl md:text-5xl leading-tight">{product.name}</h1>
+          {productCode && (
+            <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">Product Code · {productCode}</p>
+          )}
           <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">SKU · {sku}</p>
 
           {hasOffer && (
