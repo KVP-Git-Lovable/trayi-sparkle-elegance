@@ -80,6 +80,23 @@ function ProductPage() {
   const hasOffer = !!schemePricing && schemePricing.discountAmount > 0;
   const price = hasOffer ? schemePricing!.effectivePrice : listPrice;
 
+  // Colour-aware imagery: derive the selected metal's photo, keep default until verified.
+  const [colorImage, setColorImage] = useState(product.image);
+  useEffect(() => {
+    let cancelled = false;
+    setColorImage(product.image);
+    resolveColorImage(product.image, metal).then((src) => {
+      if (!cancelled) setColorImage(src);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [product.image, metal]);
+
+  const galleryImages = (product.gallery.length ? product.gallery : [product.image]).map(
+    (g, i) => (i === 0 ? colorImage : g),
+  );
+
 
   const addToBag = (goToCart = false) => {
     add({

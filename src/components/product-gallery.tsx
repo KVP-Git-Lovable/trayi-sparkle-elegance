@@ -54,6 +54,11 @@ export function ProductGallery({ images, alt, fallbackSrc }: Props) {
         <img
           src={current}
           alt={alt}
+          onError={(e) => {
+            if (fallbackSrc && e.currentTarget.src !== fallbackSrc) {
+              e.currentTarget.src = fallbackSrc;
+            }
+          }}
           className="h-full w-full object-cover transition-transform duration-200 ease-out"
           style={
             zoom
@@ -61,6 +66,7 @@ export function ProductGallery({ images, alt, fallbackSrc }: Props) {
               : undefined
           }
         />
+
 
         {/* Zoom hint */}
         <div className="absolute top-3 right-3 bg-background/80 backdrop-blur px-2 py-1 text-[10px] uppercase tracking-[0.22em] flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
