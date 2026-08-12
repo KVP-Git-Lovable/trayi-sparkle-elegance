@@ -172,7 +172,11 @@ function ProductPage() {
       {/* Product */}
       <section className="mx-auto max-w-7xl px-6 py-12 grid gap-12 md:grid-cols-2">
         {/* Gallery */}
-        <ProductGallery images={product.gallery.length ? product.gallery : [product.image]} alt={product.name} />
+        <ProductGallery
+          images={galleryImages}
+          alt={product.name}
+          fallbackSrc={product.image}
+        />
 
         {/* Info */}
         <div>
