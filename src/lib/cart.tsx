@@ -7,6 +7,10 @@ export type CartItem = {
   size?: string;
   metal?: string;
   purity?: string;
+  productName?: string;
+  productImage?: string;
+  productSku?: string;
+  productPrice?: number;
 };
 
 type CartCtx = {
@@ -80,5 +84,29 @@ export function useCart() {
 }
 
 export function itemProduct(item: CartItem): Product | undefined {
-  return getProduct(item.productId);
+  // First try to get from local products
+  const localProduct = getProduct(item.productId);
+  if (localProduct) return localProduct;
+
+  // Fall back to stored product details from cart item
+  if (item.productName && item.productImage && item.productSku && item.productPrice !== undefined) {
+    return {
+      id: item.productId,
+      name: item.productName,
+      image: item.productImage,
+      sku: item.productSku,
+      price: item.productPrice,
+      category: "",
+      metal: "",
+      metalOptions: [],
+      purityOptions: [],
+      carats: "",
+      gallery: [item.productImage],
+      description: "",
+      weightGm: 0,
+      diamondCt: 0,
+    };
+  }
+
+  return undefined;
 }

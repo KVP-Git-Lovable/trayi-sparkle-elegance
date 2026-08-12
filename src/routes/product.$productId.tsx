@@ -82,7 +82,17 @@ function ProductPage() {
 
 
   const addToBag = (goToCart = false) => {
-    add({ productId: product.id, qty, size, metal, purity });
+    add({
+      productId: product.id,
+      qty,
+      size,
+      metal,
+      purity,
+      productName: product.name,
+      productImage: product.image,
+      productSku: sku,
+      productPrice: price,
+    });
     toast.success(`${product.name} added to your bag`);
     if (goToCart) navigate({ to: "/cart" });
   };
