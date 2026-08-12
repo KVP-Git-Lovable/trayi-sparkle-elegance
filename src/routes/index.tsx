@@ -110,21 +110,21 @@ function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/60 to-transparent" />
           <div className="relative mx-auto max-w-7xl px-6 py-24 md:py-32">
             <div className="max-w-lg">
-              <span className="eyebrow">The Bridal Edit</span>
+              <span className="eyebrow">The Tanmaniya Edit</span>
               <h2 className="mt-6 font-display text-4xl md:text-5xl leading-tight">
                 Heirlooms, made for the woman you are becoming.
               </h2>
               <p className="mt-6 text-muted-foreground leading-relaxed">
-                A curated bridal collection of lab-grown diamond sets — from the
-                delicate to the ceremonial — designed to be worn, treasured, and
-                passed down.
+                A curated selection of tanmaniya and mangalsutra pendants — from
+                the delicate to the ceremonial — designed to be worn, treasured,
+                and passed down.
               </p>
               <Link
                 to="/collections/$category"
-                params={{ category: "bridal" }}
+                params={{ category: "tanmaniya" }}
                 className="mt-8 inline-flex border-b border-accent pb-1 text-[11px] uppercase tracking-[0.28em] text-foreground hover:text-accent"
               >
-                Discover Bridal
+                Discover Tanmaniya
               </Link>
             </div>
           </div>
