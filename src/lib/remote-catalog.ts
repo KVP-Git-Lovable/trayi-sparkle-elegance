@@ -271,7 +271,7 @@ export async function fetchProductsByCategory(slug: string): Promise<Product[]> 
   const rows = (data ?? []) as CatalogRow[];
 
   return rows
-    .filter((r) => TYPE_TO_SLUG[(r.product_type ?? "").toLowerCase()] === slug)
+    .filter((r) => slugForType(r.product_type) === slug)
     .map((row) => applySchemes(mapRow(row), row, schemes));
 }
 
