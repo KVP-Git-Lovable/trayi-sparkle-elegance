@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { MapPin, Phone, Mail, Clock, Instagram } from "lucide-react";
+import entranceImg from "@/assets/trayi-entrance.png";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -19,6 +20,19 @@ function ContactPage() {
   return (
     <div className="min-h-screen">
       <SiteHeader />
+
+      {/* Entrance Image Section */}
+      <section className="bg-secondary/50">
+        <div className="mx-auto max-w-6xl px-6 py-12">
+          <img
+            src={entranceImg}
+            alt="Trayi Boutique Entrance"
+            className="w-full h-auto object-cover rounded-lg"
+          />
+        </div>
+      </section>
+
+      {/* Visit Us and Appointment Section */}
       <section className="mx-auto max-w-6xl px-6 py-24 grid md:grid-cols-2 gap-16">
         <div>
           <span className="eyebrow">Visit Us</span>
