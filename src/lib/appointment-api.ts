@@ -27,6 +27,9 @@ export async function submitAppointmentRequest(request: AppointmentRequest): Pro
         name: request.fullName,
         email: request.email || null,
         phone: request.phone,
+        preferred_date: request.preferredDate || null,
+        interest: request.interest || null,
+        source: "website_appointment",
       }),
     });
 
