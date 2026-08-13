@@ -1,3 +1,5 @@
+import { POS_ANON_KEY } from "./pos-supabase";
+
 export interface AppointmentRequest {
   fullName: string;
   email: string;
@@ -7,7 +9,6 @@ export interface AppointmentRequest {
 }
 
 const STOREHAVEN_URL = "https://pdtasnfsdnfttayxibqy.supabase.co";
-const STOREHAVEN_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkdGFzbmZzZG5mdHRheXhpYnF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjM4MTk0NzIsImV4cCI6MjAzOTM5NTQ3Mn0.DdQ9H7llQVTgOXl3nAH9fI90h7Uu9jZZfDZQG7Sn3gA";
 
 export async function submitAppointmentRequest(request: AppointmentRequest): Promise<any> {
   try {
@@ -15,8 +16,8 @@ export async function submitAppointmentRequest(request: AppointmentRequest): Pro
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        apikey: STOREHAVEN_ANON_KEY,
-        Authorization: `Bearer ${STOREHAVEN_ANON_KEY}`,
+        apikey: POS_ANON_KEY,
+        Authorization: `Bearer ${POS_ANON_KEY}`,
       },
       body: JSON.stringify({
         name: request.fullName,
