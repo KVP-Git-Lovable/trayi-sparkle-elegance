@@ -2,7 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { MapPin, Phone, Mail, Clock, Instagram } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import entranceImg from "@/assets/trayi-entrance.png";
+import { submitAppointmentRequest } from "@/lib/appointment-api";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -17,6 +20,44 @@ export const Route = createFileRoute("/contact")({
 });
 
 function ContactPage() {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [preferredDate, setPreferredDate] = useState("");
+  const [interest, setInterest] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!fullName || !email || !phone) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await submitAppointmentRequest({
+        fullName,
+        email,
+        phone,
+        preferredDate,
+        interest,
+      });
+      toast.success("Appointment request submitted successfully!");
+      setFullName("");
+      setEmail("");
+      setPhone("");
+      setPreferredDate("");
+      setInterest("");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to submit appointment request";
+      toast.error(message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen">
       <SiteHeader />
@@ -57,36 +98,69 @@ function ContactPage() {
         </div>
 
         {/* Right Column: Appointment Form */}
-        <form className="border border-border p-8 md:p-10 bg-card space-y-5 h-fit">
+        <form onSubmit={handleSubmit} className="border border-border p-8 md:p-10 bg-card space-y-5 h-fit">
           <div>
             <span className="eyebrow">Book an Appointment</span>
             <h2 className="mt-3 font-display text-3xl">Tell us a little</h2>
           </div>
-          {[
-            { l: "Full Name", t: "text", p: "Priya Rao" },
-            { l: "Email", t: "email", p: "you@example.com" },
-            { l: "Phone", t: "tel", p: "+91 ..." },
-            { l: "Preferred Date", t: "date", p: "" },
-          ].map((f) => (
-            <label key={f.l} className="block">
-              <span className="eyebrow text-[10px]">{f.l}</span>
-              <input
-                type={f.t}
-                placeholder={f.p}
-                className="mt-2 w-full border-b border-input bg-transparent py-2 text-sm focus:border-accent focus:outline-none"
-              />
-            </label>
-          ))}
+          <label className="block">
+            <span className="eyebrow text-[10px]">Full Name</span>
+            <input
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Priya Rao"
+              className="mt-2 w-full border-b border-input bg-transparent py-2 text-sm focus:border-accent focus:outline-none"
+              required
+            />
+          </label>
+          <label className="block">
+            <span className="eyebrow text-[10px]">Email</span>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="mt-2 w-full border-b border-input bg-transparent py-2 text-sm focus:border-accent focus:outline-none"
+              required
+            />
+          </label>
+          <label className="block">
+            <span className="eyebrow text-[10px]">Phone</span>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+91 ..."
+              className="mt-2 w-full border-b border-input bg-transparent py-2 text-sm focus:border-accent focus:outline-none"
+              required
+            />
+          </label>
+          <label className="block">
+            <span className="eyebrow text-[10px]">Preferred Date</span>
+            <input
+              type="date"
+              value={preferredDate}
+              onChange={(e) => setPreferredDate(e.target.value)}
+              className="mt-2 w-full border-b border-input bg-transparent py-2 text-sm focus:border-accent focus:outline-none"
+            />
+          </label>
           <label className="block">
             <span className="eyebrow text-[10px]">Interest</span>
-            <textarea rows={3} placeholder="Bridal set, engagement ring, gifting…"
-              className="mt-2 w-full border-b border-input bg-transparent py-2 text-sm focus:border-accent focus:outline-none resize-none" />
+            <textarea
+              rows={3}
+              value={interest}
+              onChange={(e) => setInterest(e.target.value)}
+              placeholder="Bridal set, engagement ring, gifting…"
+              className="mt-2 w-full border-b border-input bg-transparent py-2 text-sm focus:border-accent focus:outline-none resize-none"
+            />
           </label>
           <button
-            type="button"
-            className="w-full bg-foreground py-4 text-[11px] uppercase tracking-[0.28em] text-background hover:bg-accent transition-colors"
+            type="submit"
+            disabled={submitting}
+            className="w-full bg-foreground py-4 text-[11px] uppercase tracking-[0.28em] text-background hover:bg-accent transition-colors disabled:opacity-60"
           >
-            Request Appointment
+            {submitting ? "Submitting..." : "Request Appointment"}
           </button>
         </form>
       </section>
