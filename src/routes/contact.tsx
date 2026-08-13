@@ -21,20 +21,21 @@ function ContactPage() {
     <div className="min-h-screen">
       <SiteHeader />
 
-      {/* Entrance Image Section */}
-      <section className="bg-secondary/50">
-        <div className="mx-auto max-w-6xl px-6 py-12">
-          <img
-            src={entranceImg}
-            alt="Trayi Boutique Entrance"
-            className="w-full h-auto object-cover rounded-lg"
-          />
-        </div>
-      </section>
-
       {/* Visit Us and Appointment Section */}
       <section className="mx-auto max-w-6xl px-6 py-24 grid md:grid-cols-2 gap-16">
-        <div>
+        {/* Left Column: Image + Visit Us */}
+        <div className="space-y-8">
+          {/* Entrance Image */}
+          <div className="overflow-hidden rounded-lg">
+            <img
+              src={entranceImg}
+              alt="Trayi Boutique Entrance"
+              className="w-full h-auto object-cover"
+            />
+          </div>
+
+          {/* Visit Us Content */}
+          <div>
           <span className="eyebrow">Visit Us</span>
           <h1 className="mt-4 font-display text-5xl leading-tight">
             An unhurried appointment, in Mangalore.
@@ -52,9 +53,11 @@ function ContactPage() {
             <li className="flex gap-3"><Clock className="h-4 w-4 mt-1 text-accent shrink-0" /><span>Open daily · 10:30 AM – 8:30 PM</span></li>
             <li className="flex gap-3"><Instagram className="h-4 w-4 mt-1 text-accent shrink-0" /><a href="https://www.instagram.com/trayijewellers/" target="_blank" rel="noopener noreferrer" className="hover:text-accent">@trayijewellers</a></li>
           </ul>
+          </div>
         </div>
 
-        <form className="border border-border p-8 md:p-10 bg-card space-y-5">
+        {/* Right Column: Appointment Form */}
+        <form className="border border-border p-8 md:p-10 bg-card space-y-5 h-fit">
           <div>
             <span className="eyebrow">Book an Appointment</span>
             <h2 className="mt-3 font-display text-3xl">Tell us a little</h2>
