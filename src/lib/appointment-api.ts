@@ -1,5 +1,3 @@
-import { POS_ANON_KEY } from "./pos-supabase";
-
 export interface AppointmentRequest {
   fullName: string;
   email: string;
@@ -12,26 +10,23 @@ const STOREHAVEN_URL = "https://pdtasnfsdnfttayxibqy.supabase.co";
 
 export async function submitAppointmentRequest(request: AppointmentRequest): Promise<any> {
   try {
-    const response = await fetch(`${STOREHAVEN_URL}/rest/v1/leads`, {
+    const response = await fetch(`${STOREHAVEN_URL}/functions/v1/create_online_lead`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        apikey: POS_ANON_KEY,
-        Authorization: `Bearer ${POS_ANON_KEY}`,
       },
       body: JSON.stringify({
-        name: request.fullName,
+        fullName: request.fullName,
         email: request.email,
         phone: request.phone,
-        address: `Preferred Date: ${request.preferredDate} | Interest: ${request.interest}`,
-        city: "Mangalore",
-        country: "India",
+        preferredDate: request.preferredDate,
+        interest: request.interest,
       }),
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || `HTTP ${response.status}`);
+      throw new Error(errorData.error || `HTTP ${response.status}`);
     }
 
     const data = await response.json();
