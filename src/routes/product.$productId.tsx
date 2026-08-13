@@ -137,7 +137,7 @@ function ProductPage() {
       productImage: product.image,
       productSku: sku,
       productPrice: price,
-      productCode,
+      productCode: productCode ?? undefined,
     });
     toast.success(`${product.name} added to your bag`);
     if (goToCart) navigate({ to: "/cart" });
