@@ -1,7 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import bannerImg from "@/assets/collection-banner.jpg";
+import photo1 from "@/about_photos/WhatsApp Image 2026-08-14 at 12.10.44.jpeg";
+import photo2 from "@/about_photos/WhatsApp Image 2026-08-14 at 12.10.45 (1).jpeg";
+import photo3 from "@/about_photos/WhatsApp Image 2026-08-14 at 12.10.45 (2).jpeg";
+import photo4 from "@/about_photos/WhatsApp Image 2026-08-14 at 12.10.45.jpeg";
+import photo5 from "@/about_photos/WhatsApp Image 2026-08-14 at 12.10.46 (1).jpeg";
+import photo6 from "@/about_photos/WhatsApp Image 2026-08-14 at 12.10.46 (2).jpeg";
+import photo7 from "@/about_photos/WhatsApp Image 2026-08-14 at 12.10.46.jpeg";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -10,13 +16,14 @@ export const Route = createFileRoute("/about")({
       { name: "description", content: "Trayi is Mangalore's exclusive boutique for LimeLight lab-grown diamonds — a house built on integrity, craft and conscience." },
       { property: "og:title", content: "Our Story — Trayi Jewellery" },
       { property: "og:description", content: "Mangalore's exclusive LimeLight lab-grown diamond boutique." },
-      { property: "og:image", content: bannerImg },
     ],
   }),
   component: AboutPage,
 });
 
 function AboutPage() {
+  const photos = [photo1, photo2, photo3, photo4, photo5, photo6, photo7];
+
   return (
     <div className="min-h-screen">
       <SiteHeader />
@@ -35,12 +42,6 @@ function AboutPage() {
         </p>
       </section>
 
-      <section className="relative">
-        <div className="aspect-[16/6] overflow-hidden">
-          <img src={bannerImg} alt="" className="h-full w-full object-cover" />
-        </div>
-      </section>
-
       <section className="mx-auto max-w-4xl px-6 py-24 grid md:grid-cols-3 gap-12">
         {[
           { t: "Integrity", d: "Every stone is IGI-certified and fully traceable. No exceptions, no fine print." },
@@ -52,6 +53,16 @@ function AboutPage() {
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{v.d}</p>
           </div>
         ))}
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {photos.map((photo, idx) => (
+            <div key={idx} className="overflow-hidden rounded-lg">
+              <img src={photo} alt={`Trayi boutique ${idx + 1}`} className="w-full h-auto object-cover" />
+            </div>
+          ))}
+        </div>
       </section>
 
       <SiteFooter />
