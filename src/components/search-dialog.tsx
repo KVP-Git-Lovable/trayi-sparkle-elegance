@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { Search, X } from "lucide-react";
+import { Search, X, Loader2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { fetchAllProducts } from "@/lib/remote-catalog";
+import type { Product } from "@/lib/catalog";
 
 const SEARCH_ITEMS = [
   { id: "collections", label: "All Collections", to: "/collections", type: "section" },
@@ -27,7 +29,26 @@ interface SearchItem {
 export function SearchDialog() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchItem[]>(SEARCH_ITEMS);
+  const [results, setResults] = useState<(SearchItem | { id: string; label: string; to: string; type: string })[]>(SEARCH_ITEMS);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [productsLoaded, setProductsLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!productsLoaded) {
+      setLoading(true);
+      fetchAllProducts()
+        .then((prods) => {
+          setProducts(prods);
+          setProductsLoaded(true);
+        })
+        .catch((err) => {
+          console.error("Failed to fetch products:", err);
+          setProductsLoaded(true);
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [productsLoaded]);
 
   useEffect(() => {
     if (!query.trim()) {
@@ -36,11 +57,25 @@ export function SearchDialog() {
     }
 
     const searchQuery = query.toLowerCase();
-    const filtered = SEARCH_ITEMS.filter((item) =>
+
+    // Search in static items
+    const staticResults = SEARCH_ITEMS.filter((item) =>
       item.label.toLowerCase().includes(searchQuery)
     );
-    setResults(filtered);
-  }, [query]);
+
+    // Search in products
+    const productResults = products
+      .filter((p) => p.name.toLowerCase().includes(searchQuery))
+      .map((p) => ({
+        id: p.id,
+        label: p.name,
+        to: `/product/$productId`,
+        params: { productId: p.id },
+        type: "product",
+      }));
+
+    setResults([...staticResults, ...productResults]);
+  }, [query, products]);
 
   const handleClose = () => {
     setOpen(false);
@@ -94,21 +129,29 @@ export function SearchDialog() {
 
             {open && (
               <div className="mt-4 space-y-2 max-h-96 overflow-y-auto">
-                {results.length > 0 ? (
-                  results.map((item) => (
-                    <Link
-                      key={item.id}
-                      to={item.to}
-                      params={item.params as never}
-                      onClick={handleClose}
-                      className="block px-3 py-2 rounded hover:bg-muted/60 transition-colors text-sm"
-                    >
-                      <div className="font-medium text-foreground">{item.label}</div>
-                      <div className="text-[11px] text-muted-foreground uppercase tracking-wide mt-0.5">
-                        {item.type}
-                      </div>
-                    </Link>
-                  ))
+                {loading && !productsLoaded ? (
+                  <div className="px-3 py-4 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading products...
+                  </div>
+                ) : results.length > 0 ? (
+                  results.map((item) => {
+                    const isProduct = item.type === "product";
+                    return (
+                      <Link
+                        key={item.id}
+                        to={isProduct ? `/product/$productId` : item.to}
+                        params={isProduct ? { productId: item.id } : (item.params as never)}
+                        onClick={handleClose}
+                        className="block px-3 py-2 rounded hover:bg-muted/60 transition-colors text-sm"
+                      >
+                        <div className="font-medium text-foreground">{item.label}</div>
+                        <div className="text-[11px] text-muted-foreground uppercase tracking-wide mt-0.5">
+                          {item.type}
+                        </div>
+                      </Link>
+                    );
+                  })
                 ) : (
                   <div className="px-3 py-4 text-center text-sm text-muted-foreground">
                     No results found for "{query}"

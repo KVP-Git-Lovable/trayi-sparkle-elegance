@@ -302,3 +302,18 @@ export async function fetchRelated(
   const items = await fetchProductsByCategory(category);
   return items.filter((p) => p.id !== excludeId).slice(0, limit);
 }
+
+export async function fetchAllProducts(): Promise<Product[]> {
+  const [{ data, error }, schemes] = await Promise.all([
+    posSupabase
+      .from("catalog_products")
+      .select(SELECT)
+      .eq("status", "active")
+      .order("sort_order", { ascending: true }),
+    fetchActiveSchemes(),
+  ]);
+  if (error) throw error;
+
+  const rows = (data ?? []) as CatalogRow[];
+  return rows.map((row) => applySchemes(mapRow(row), row, schemes));
+}
