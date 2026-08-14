@@ -370,39 +370,6 @@ function ProductPage() {
         </div>
       </section>
 
-      {/* Details */}
-      <section className="border-t border-border/60 bg-secondary/30">
-        <div className="mx-auto max-w-7xl px-6 py-16 grid gap-10 md:grid-cols-2">
-          <div>
-            <span className="eyebrow">Specifications</span>
-            <dl className="mt-6 divide-y divide-border/60 text-sm">
-              {[
-                ["Diamond", `${product.diamondCt} ct · LimeLight CVD lab-grown`],
-                ["Metal", product.metal],
-                ["Gross Weight", `${product.weightGm} g`],
-                ["Certification", "IGI Certificate included"],
-                ["SKU", sku],
-              ].map(([k, v]) => (
-                <div key={k} className="grid grid-cols-2 py-3">
-                  <dt className="text-muted-foreground">{k}</dt>
-                  <dd className="text-foreground">{v}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-          <div>
-            <span className="eyebrow">The Trayi Promise</span>
-            <ul className="mt-6 space-y-4 text-sm text-foreground/80">
-              <li>· 100% real diamonds, chemically identical to mined — grown in weeks, not billions of years.</li>
-              <li>· Every stone accompanied by an IGI grading certificate.</li>
-              <li>· Lifetime free cleaning and polishing at our Mangalore boutique.</li>
-              <li>· Assured lifetime buyback and exchange on the diamond value.</li>
-              <li>· 15-day easy return on unworn pieces with original packaging.</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
       {/* Related */}
       {related.length > 0 && (
         <section className="mx-auto max-w-7xl px-6 py-20">
