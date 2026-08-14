@@ -42,6 +42,16 @@ function AboutPage() {
         </p>
       </section>
 
+      <section className="mx-auto max-w-7xl px-6 py-16">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {photos.map((photo, idx) => (
+            <div key={idx} className="overflow-hidden rounded-lg aspect-square">
+              <img src={photo} alt={`Trayi boutique ${idx + 1}`} className="w-full h-full object-cover" />
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="mx-auto max-w-4xl px-6 py-24 grid md:grid-cols-3 gap-12">
         {[
           { t: "Integrity", d: "Every stone is IGI-certified and fully traceable. No exceptions, no fine print." },
@@ -53,16 +63,6 @@ function AboutPage() {
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{v.d}</p>
           </div>
         ))}
-      </section>
-
-      <section className="mx-auto max-w-6xl px-6 py-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {photos.map((photo, idx) => (
-            <div key={idx} className="overflow-hidden rounded-lg">
-              <img src={photo} alt={`Trayi boutique ${idx + 1}`} className="w-full h-auto object-cover" />
-            </div>
-          ))}
-        </div>
       </section>
 
       <SiteFooter />
