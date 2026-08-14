@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import photo1 from "@/about_photos/WhatsApp Image 2026-08-14 at 12.10.44.jpeg";
-import photo2 from "@/about_photos/WhatsApp Image 2026-08-14 at 12.10.45 (1).jpeg";
-import photo3 from "@/about_photos/WhatsApp Image 2026-08-14 at 12.10.45 (2).jpeg";
-import photo4 from "@/about_photos/WhatsApp Image 2026-08-14 at 12.10.45.jpeg";
-import photo5 from "@/about_photos/WhatsApp Image 2026-08-14 at 12.10.46 (1).jpeg";
-import photo6 from "@/about_photos/WhatsApp Image 2026-08-14 at 12.10.46 (2).jpeg";
-import photo7 from "@/about_photos/WhatsApp Image 2026-08-14 at 12.10.46.jpeg";
+import photo1 from "@/about_photos/about-photo-1.jpeg";
+import photo2 from "@/about_photos/about-photo-2.jpeg";
+import photo3 from "@/about_photos/about-photo-3.jpeg";
+import photo4 from "@/about_photos/about-photo-4.jpeg";
+import photo5 from "@/about_photos/about-photo-5.jpeg";
+import photo6 from "@/about_photos/about-photo-6.jpeg";
+import photo7 from "@/about_photos/about-photo-7.jpeg";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
