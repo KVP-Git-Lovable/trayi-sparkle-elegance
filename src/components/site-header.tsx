@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { Search, User, ShoppingBag, Menu } from "lucide-react";
+import { User, ShoppingBag, Menu } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
+import { SearchDialog } from "./search-dialog";
 import headerLogo from "@/assets/trayi-header-logo.png";
 
 const nav: Array<{ to: string; params?: Record<string, string>; label: string }> = [
@@ -29,9 +30,7 @@ export function SiteHeader() {
         </button>
 
         <div className="hidden md:flex flex-1 items-center gap-6 text-[13px] tracking-wide text-foreground/80">
-          <button aria-label="Search" className="hover:text-accent transition-colors">
-            <Search className="h-4 w-4" />
-          </button>
+          <SearchDialog />
         </div>
 
         <Link to="/" className="flex items-center gap-3 leading-none">
