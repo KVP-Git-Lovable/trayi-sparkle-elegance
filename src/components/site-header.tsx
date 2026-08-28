@@ -8,7 +8,6 @@ import headerLogo from "@/assets/trayi-header-logo.png";
 
 const nav: Array<{ to: string; params?: Record<string, string>; label: string }> = [
   { to: "/collections", label: "Collections" },
-  { to: "/collections/$category", params: { category: "tanmaniya" }, label: "Tanmaniya" },
   { to: "/education", label: "Lab-Grown Diamonds" },
   { to: "/about", label: "Our Story" },
   { to: "/contact", label: "Visit Us" },
