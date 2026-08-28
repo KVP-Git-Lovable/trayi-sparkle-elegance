@@ -189,7 +189,7 @@ function mapRow(row: CatalogRow): Product {
 
   return {
     id: row.handle ?? row.id,
-    name: row.title,
+    name: cleanText(row.title),
     category: slug,
     price: Number(price) || 0,
     mrp: mrp && mrp > 0 ? Number(mrp) : undefined,
@@ -201,11 +201,11 @@ function mapRow(row: CatalogRow): Product {
     sizeLabel: sizes ? SIZE_LABEL[slug] ?? "Size" : undefined,
     image,
     gallery: image ? [image] : [],
-    description: cleanText(stripHtml(row.description)) || row.title,
+    description: cleanText(stripHtml(row.description)) || cleanText(row.title),
     sku,
     weightGm: 0,
     diamondCt: 0,
-    tags: row.tags ?? [],
+    tags: (row.tags ?? []).map(tag => cleanText(tag)),
     variants: variants.length ? variants : undefined,
   };
 }
