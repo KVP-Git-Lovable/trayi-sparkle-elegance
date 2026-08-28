@@ -94,10 +94,13 @@ export function cleanText(input: string | null | undefined): string {
   let out = input.replace(/[^\x00-\x7F]+/g, (run) => repairRun(run));
 
   // Remove leftover mojibake patterns that couldn't be fully decoded.
-  // These are byte sequences from UTF-8→CP1252→UTF-8 corruption that got stuck.
+  // Pattern 1: Byte sequences in C0-C7 range (common mojibake markers)
   out = out.replace(/[\xC0-\xC7](?:[\x80-\xBF]|[\xC0-\xC7])/g, "");
 
-  // Remove specific mojibake character sequences (common known bad patterns).
+  // Pattern 2: Multiple consecutive Latin-1 extended chars
+  out = out.replace(/[\xC0-\xC7]{2,}|[\xE0-\xE7]{2,}/g, "");
+
+  // Pattern 3: Specific known mojibake patterns
   out = out.replace(/Â(?=[\s<]|$)/g, "");
 
   // Real non-breaking spaces / stray replacement chars → plain spaces.
