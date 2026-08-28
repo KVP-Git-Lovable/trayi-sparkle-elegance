@@ -29,7 +29,7 @@ interface SearchItem {
 export function SearchDialog() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<(SearchItem | { id: string; label: string; to: string; type: string })[]>(SEARCH_ITEMS);
+  const [results, setResults] = useState<SearchItem[]>(SEARCH_ITEMS);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [productsLoaded, setProductsLoaded] = useState(false);

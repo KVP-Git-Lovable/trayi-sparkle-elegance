@@ -1,6 +1,7 @@
 import { posSupabase } from "./pos-supabase";
 import type { Product } from "./catalog";
 import { evaluateApplicableSchemes, type Scheme } from "./pos-schemes";
+import { cleanText } from "./text-clean";
 
 type CatalogRow = {
   id: string;
@@ -200,7 +201,7 @@ function mapRow(row: CatalogRow): Product {
     sizeLabel: sizes ? SIZE_LABEL[slug] ?? "Size" : undefined,
     image,
     gallery: image ? [image] : [],
-    description: stripHtml(row.description) || row.title,
+    description: cleanText(stripHtml(row.description)) || row.title,
     sku,
     weightGm: 0,
     diamondCt: 0,
