@@ -239,18 +239,20 @@ function CheckoutPage() {
                         {it.productCode && `${it.productCode} · `}{[it.purity, it.metal, it.size && `Sz ${it.size}`].filter(Boolean).join(" · ")} · Qty {it.qty}
                       </p>
                     </div>
-                    <p className="text-sm">{formatINR(p.price * it.qty)}</p>
+                    {!hidePrices && <p className="text-sm">{formatINR(p.price * it.qty)}</p>}
                   </div>
                 );
               })}
             </div>
-            <div className="border-t border-border/60 pt-4 space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>{formatINR(subtotal)}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">{fulfilment === "pickup" ? "Pickup" : "Shipping"}</span><span className="text-accent">Complimentary</span></div>
-              <div className="flex justify-between font-display text-lg pt-2 border-t border-border/60">
-                <span>Total</span><span>{formatINR(subtotal)}</span>
+            {!hidePrices && (
+              <div className="border-t border-border/60 pt-4 space-y-2 text-sm">
+                <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>{formatINR(subtotal)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">{fulfilment === "pickup" ? "Pickup" : "Shipping"}</span><span className="text-accent">Complimentary</span></div>
+                <div className="flex justify-between font-display text-lg pt-2 border-t border-border/60">
+                  <span>Total</span><span>{formatINR(subtotal)}</span>
+                </div>
               </div>
-            </div>
+            )}
             <button
               type="submit"
               disabled={placing}
