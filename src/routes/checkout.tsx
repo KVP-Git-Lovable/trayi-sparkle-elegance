@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { useCart, itemProduct } from "@/lib/cart";
 import { formatINR } from "@/lib/catalog";
+import { usePriceVisibility } from "@/lib/price-visibility";
 import { Store, Truck, ShieldCheck, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { createOnlineOrder } from "@/lib/storehaven-api";
