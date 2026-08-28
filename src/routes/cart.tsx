@@ -18,6 +18,7 @@ export const Route = createFileRoute("/cart")({
 
 function CartPage() {
   const { items, setQty, remove, subtotal, hydrated } = useCart();
+  const { hidePrices } = usePriceVisibility();
 
   if (hydrated && items.length === 0) {
     return (
