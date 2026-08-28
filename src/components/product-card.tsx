@@ -1,9 +1,18 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Heart } from "lucide-react";
+import { toast } from "sonner";
 import { formatINR, type Product } from "@/lib/catalog";
 import { usePriceVisibility } from "@/lib/price-visibility";
+import { useWishlist } from "@/lib/wishlist";
+import { useAuth } from "@/lib/auth";
 
 export function ProductCard({ product }: { product: Product }) {
   const { hidePrices } = usePriceVisibility();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { has, toggle } = useWishlist();
+  const saved = has(product.id);
+
   const offer = product.offer;
   const offerPrice = offer?.offerPrice;
   const hasOffer = !!offerPrice && offerPrice < product.price;
@@ -18,6 +27,21 @@ export function ProductCard({ product }: { product: Product }) {
   const discountPercent = product.mrp
     ? Math.round(((product.mrp - product.price) / product.mrp) * 100)
     : 0;
+
+  const onWishlistClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      toast.info("Sign in to save pieces to your wishlist");
+      navigate({ to: "/login" });
+      return;
+    }
+
+    const result = await toggle(product, displayPrice);
+    if (result === "added") toast.success(`${product.name} saved to your wishlist`);
+    if (result === "removed") toast.success("Removed from your wishlist");
+  };
 
   return (
     <Link
@@ -43,6 +67,16 @@ export function ProductCard({ product }: { product: Product }) {
             </span>
           )
         )}
+        <button
+          onClick={onWishlistClick}
+          aria-pressed={saved}
+          className="absolute right-3 top-3 z-20 p-2 hover:text-accent transition-colors"
+          aria-label={saved ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <Heart
+            className={`h-5 w-5 ${saved ? "fill-accent text-accent" : "text-foreground/60"}`}
+          />
+        </button>
         <span className="absolute inset-x-4 bottom-4 translate-y-4 opacity-0 bg-background/95 py-3 text-center text-[11px] uppercase tracking-[0.24em] text-foreground transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
           View Details
         </span>
