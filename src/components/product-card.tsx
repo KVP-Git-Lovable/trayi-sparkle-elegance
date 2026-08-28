@@ -3,6 +3,7 @@ import { formatINR, type Product } from "@/lib/catalog";
 import { usePriceVisibility } from "@/lib/price-visibility";
 
 export function ProductCard({ product }: { product: Product }) {
+  const { hidePrices } = usePriceVisibility();
   const offer = product.offer;
   const offerPrice = offer?.offerPrice;
   const hasOffer = !!offerPrice && offerPrice < product.price;
