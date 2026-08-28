@@ -82,10 +82,10 @@ function CartPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm">{formatINR(p.price * it.qty)}</p>
+                    {!hidePrices && <p className="text-sm">{formatINR(p.price * it.qty)}</p>}
                     <button
                       onClick={() => remove(idx)}
-                      className="mt-3 inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground hover:text-accent"
+                      className={`inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground hover:text-accent ${hidePrices ? "" : "mt-3"}`}
                     >
                       <X className="h-3 w-3" /> Remove
                     </button>
