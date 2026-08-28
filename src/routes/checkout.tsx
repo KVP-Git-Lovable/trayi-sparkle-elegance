@@ -24,6 +24,7 @@ type PayMethod = "card" | "upi" | "cod_pickup";
 
 function CheckoutPage() {
   const { items, subtotal, clear, hydrated } = useCart();
+  const { hidePrices } = usePriceVisibility();
   const navigate = useNavigate();
 
   const [fulfilment, setFulfilment] = useState<Fulfilment>("delivery");
