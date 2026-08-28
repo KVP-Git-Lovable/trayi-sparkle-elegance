@@ -61,7 +61,7 @@ describe("cleanText", () => {
     });
 
     it("cleans high quotation mark", () => {
-      expect(cleanText("Ã¢â‚¬Ÿ")).toBe(""");
+      expect(cleanText("Ã¢â‚¬Ÿ")).toBe('"');
     });
 
     it("cleans trademark symbol", () => {
@@ -140,7 +140,7 @@ describe("cleanText", () => {
   describe("regression: real product descriptions", () => {
     it("cleans description with smart quotes and special characters", () => {
       const desc =
-        "Elegant ringÃ‚Â with "elegant" designÃƒâ€š and clean craftsmanship";
+        'Elegant ringÃ‚Â with "elegant" designÃƒâ€š and clean craftsmanship';
       const result = cleanText(desc);
       expect(result).not.toMatch(/Ã/);
       expect(result).not.toMatch(/Â/);
