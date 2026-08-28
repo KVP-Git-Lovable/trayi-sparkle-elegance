@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { formatINR, type Product } from "@/lib/catalog";
+import { usePriceVisibility } from "@/lib/price-visibility";
 
 export function ProductCard({ product }: { product: Product }) {
   const offer = product.offer;
