@@ -4,6 +4,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { ShoppingBag, Minus, Plus, X, Truck, Store } from "lucide-react";
 import { useCart, itemProduct } from "@/lib/cart";
 import { formatINR } from "@/lib/catalog";
+import { usePriceVisibility } from "@/lib/price-visibility";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({
