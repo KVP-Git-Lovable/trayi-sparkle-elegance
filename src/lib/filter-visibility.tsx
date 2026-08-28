@@ -9,6 +9,24 @@ interface FilterVisibilityContextType {
 
 const FilterVisibilityContext = createContext<FilterVisibilityContextType | undefined>(undefined);
 
+/**
+ * The config value may be stored as a JSON boolean, a string, or a number.
+ * Anything explicitly falsy ("false", false, "hide", "0", "no") hides the filter.
+ * Missing rows default to visible.
+ */
+function parseFlag(value: unknown, fallback = true): boolean {
+  if (value === null || value === undefined) return fallback;
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value !== 0;
+  if (typeof value === "string") {
+    const v = value.trim().toLowerCase().replace(/^"|"$/g, "");
+    if (["false", "hide", "hidden", "0", "no", "off"].includes(v)) return false;
+    if (["true", "show", "visible", "1", "yes", "on"].includes(v)) return true;
+    return fallback;
+  }
+  return fallback;
+}
+
 export function FilterVisibilityProvider({ children }: { children: ReactNode }) {
   const [showPriceFilter, setShowPriceFilter] = useState(true);
   const [showColourFilter, setShowColourFilter] = useState(true);
