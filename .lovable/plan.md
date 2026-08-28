@@ -26,3 +26,7 @@ No other behaviour changes — the price-display toggle, product data, filtering
 
 - The Supabase column is JSONB, so values arrive as native JSON (`false`), not strings. A small `parseFlag(value)` helper handles both shapes.
 - Only `src/lib/filter-visibility.tsx` changes; `collection-filters.tsx` already gates the Price and Colour sections on these flags.
+
+## Also included: unblock the build
+
+`src/lib/text-clean.test.ts` currently fails to compile — lines 64 and 143 contain unescaped double quotes inside double-quoted strings. Fix by switching those two literals to single-quoted strings (test expectations unchanged).
