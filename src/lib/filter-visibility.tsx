@@ -48,13 +48,11 @@ export function FilterVisibilityProvider({ children }: { children: ReactNode }) 
           .maybeSingle();
 
         if (!priceError) {
-          // Default to true (show) if not set or if value is not "false"
-          setShowPriceFilter(priceFilterData?.value !== "false");
+          setShowPriceFilter(parseFlag(priceFilterData?.value));
         }
 
         if (!colourError) {
-          // Default to true (show) if not set or if value is not "false"
-          setShowColourFilter(colourFilterData?.value !== "false");
+          setShowColourFilter(parseFlag(colourFilterData?.value));
         }
       } catch (error) {
         console.warn("Failed to fetch filter visibility settings:", error);
