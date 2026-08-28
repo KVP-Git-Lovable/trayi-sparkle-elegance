@@ -4,6 +4,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { ShoppingBag, Minus, Plus, X, Truck, Store } from "lucide-react";
 import { useCart, itemProduct } from "@/lib/cart";
 import { formatINR } from "@/lib/catalog";
+import { usePriceVisibility } from "@/lib/price-visibility";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/cart")({
 
 function CartPage() {
   const { items, setQty, remove, subtotal, hydrated } = useCart();
+  const { hidePrices } = usePriceVisibility();
 
   if (hydrated && items.length === 0) {
     return (
@@ -80,10 +82,10 @@ function CartPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm">{formatINR(p.price * it.qty)}</p>
+                    {!hidePrices && <p className="text-sm">{formatINR(p.price * it.qty)}</p>}
                     <button
                       onClick={() => remove(idx)}
-                      className="mt-3 inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground hover:text-accent"
+                      className={`inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.2em] text-muted-foreground hover:text-accent ${hidePrices ? "" : "mt-3"}`}
                     >
                       <X className="h-3 w-3" /> Remove
                     </button>
@@ -96,19 +98,23 @@ function CartPage() {
           {/* Summary */}
           <aside className="h-fit border border-border/60 p-6 space-y-4">
             <h2 className="eyebrow">Order Summary</h2>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span>{formatINR(subtotal)}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Shipping</span>
-              <span className="text-accent">Complimentary</span>
-            </div>
-            <div className="border-t border-border/60 pt-4 flex justify-between">
-              <span className="font-display text-lg">Total</span>
-              <span className="font-display text-lg">{formatINR(subtotal)}</span>
-            </div>
-            <p className="text-xs text-muted-foreground">Inclusive of all taxes.</p>
+            {!hidePrices && (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span>{formatINR(subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Shipping</span>
+                  <span className="text-accent">Complimentary</span>
+                </div>
+                <div className="border-t border-border/60 pt-4 flex justify-between">
+                  <span className="font-display text-lg">Total</span>
+                  <span className="font-display text-lg">{formatINR(subtotal)}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">Inclusive of all taxes.</p>
+              </>
+            )}
 
             <div className="grid gap-2 pt-2 text-xs text-muted-foreground">
               <div className="flex items-start gap-2"><Truck className="h-4 w-4 mt-0.5 text-accent" /> Free insured delivery across India</div>

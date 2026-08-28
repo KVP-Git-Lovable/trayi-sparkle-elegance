@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { formatINR, type Product } from "@/lib/catalog";
+import { usePriceVisibility } from "@/lib/price-visibility";
 
 export function ProductCard({ product }: { product: Product }) {
+  const { hidePrices } = usePriceVisibility();
   const offer = product.offer;
   const offerPrice = offer?.offerPrice;
   const hasOffer = !!offerPrice && offerPrice < product.price;
@@ -50,18 +52,22 @@ export function ProductCard({ product }: { product: Product }) {
         <p className="mt-1 text-xs text-muted-foreground tracking-wide">
           {product.carats} · {product.metal}
         </p>
-        <p className="mt-2 text-sm text-foreground/90">
-          {formatINR(displayPrice)}
-          {strikePrice && strikePrice > displayPrice && (
-            <span className="ml-2 text-xs text-muted-foreground line-through">
-              {formatINR(strikePrice)}
-            </span>
-          )}
-        </p>
-        {savingAmount > 0 && (
-          <p className="mt-1 text-xs text-green-600 font-medium">
-            Save {formatINR(savingAmount)}
-          </p>
+        {!hidePrices && (
+          <>
+            <p className="mt-2 text-sm text-foreground/90">
+              {formatINR(displayPrice)}
+              {strikePrice && strikePrice > displayPrice && (
+                <span className="ml-2 text-xs text-muted-foreground line-through">
+                  {formatINR(strikePrice)}
+                </span>
+              )}
+            </p>
+            {savingAmount > 0 && (
+              <p className="mt-1 text-xs text-green-600 font-medium">
+                Save {formatINR(savingAmount)}
+              </p>
+            )}
+          </>
         )}
       </div>
     </Link>

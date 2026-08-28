@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { useCart, itemProduct } from "@/lib/cart";
 import { formatINR } from "@/lib/catalog";
+import { usePriceVisibility } from "@/lib/price-visibility";
 import { Store, Truck, ShieldCheck, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { createOnlineOrder } from "@/lib/storehaven-api";
@@ -23,6 +24,7 @@ type PayMethod = "card" | "upi" | "cod_pickup";
 
 function CheckoutPage() {
   const { items, subtotal, clear, hydrated } = useCart();
+  const { hidePrices } = usePriceVisibility();
   const navigate = useNavigate();
 
   const [fulfilment, setFulfilment] = useState<Fulfilment>("delivery");
@@ -237,18 +239,20 @@ function CheckoutPage() {
                         {it.productCode && `${it.productCode} · `}{[it.purity, it.metal, it.size && `Sz ${it.size}`].filter(Boolean).join(" · ")} · Qty {it.qty}
                       </p>
                     </div>
-                    <p className="text-sm">{formatINR(p.price * it.qty)}</p>
+                    {!hidePrices && <p className="text-sm">{formatINR(p.price * it.qty)}</p>}
                   </div>
                 );
               })}
             </div>
-            <div className="border-t border-border/60 pt-4 space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>{formatINR(subtotal)}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">{fulfilment === "pickup" ? "Pickup" : "Shipping"}</span><span className="text-accent">Complimentary</span></div>
-              <div className="flex justify-between font-display text-lg pt-2 border-t border-border/60">
-                <span>Total</span><span>{formatINR(subtotal)}</span>
+            {!hidePrices && (
+              <div className="border-t border-border/60 pt-4 space-y-2 text-sm">
+                <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>{formatINR(subtotal)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">{fulfilment === "pickup" ? "Pickup" : "Shipping"}</span><span className="text-accent">Complimentary</span></div>
+                <div className="flex justify-between font-display text-lg pt-2 border-t border-border/60">
+                  <span>Total</span><span>{formatINR(subtotal)}</span>
+                </div>
               </div>
-            </div>
+            )}
             <button
               type="submit"
               disabled={placing}
