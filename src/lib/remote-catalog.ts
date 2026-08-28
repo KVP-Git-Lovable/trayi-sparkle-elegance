@@ -1,6 +1,7 @@
 import { posSupabase } from "./pos-supabase";
 import type { Product } from "./catalog";
 import { evaluateApplicableSchemes, type Scheme } from "./pos-schemes";
+import { cleanText } from "./text-clean";
 
 type CatalogRow = {
   id: string;
