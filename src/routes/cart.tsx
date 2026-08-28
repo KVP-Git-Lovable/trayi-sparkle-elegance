@@ -98,19 +98,23 @@ function CartPage() {
           {/* Summary */}
           <aside className="h-fit border border-border/60 p-6 space-y-4">
             <h2 className="eyebrow">Order Summary</h2>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span>{formatINR(subtotal)}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Shipping</span>
-              <span className="text-accent">Complimentary</span>
-            </div>
-            <div className="border-t border-border/60 pt-4 flex justify-between">
-              <span className="font-display text-lg">Total</span>
-              <span className="font-display text-lg">{formatINR(subtotal)}</span>
-            </div>
-            <p className="text-xs text-muted-foreground">Inclusive of all taxes.</p>
+            {!hidePrices && (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span>{formatINR(subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Shipping</span>
+                  <span className="text-accent">Complimentary</span>
+                </div>
+                <div className="border-t border-border/60 pt-4 flex justify-between">
+                  <span className="font-display text-lg">Total</span>
+                  <span className="font-display text-lg">{formatINR(subtotal)}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">Inclusive of all taxes.</p>
+              </>
+            )}
 
             <div className="grid gap-2 pt-2 text-xs text-muted-foreground">
               <div className="flex items-start gap-2"><Truck className="h-4 w-4 mt-0.5 text-accent" /> Free insured delivery across India</div>
