@@ -8,6 +8,7 @@ import {
   isActive,
   optionCount,
 } from "@/lib/product-filters";
+import { useFilterVisibility } from "@/lib/filter-visibility";
 import { ChevronUp } from "lucide-react";
 
 type ListKey = keyof Omit<Filters, "min" | "max">;
@@ -97,6 +98,7 @@ export function CollectionFilters({
   onChange: (next: Partial<Filters>) => void;
   onClear: () => void;
 }) {
+  const { showPriceFilter, showColourFilter } = useFilterVisibility();
   const max = facets.maxPrice;
   const currentMax = filters.max > 0 ? Math.min(filters.max, max) : max;
   const [range, setRange] = useState<[number, number]>([filters.min, currentMax]);
@@ -136,7 +138,7 @@ export function CollectionFilters({
         )}
       </div>
 
-      {max > 0 && (
+      {showPriceFilter && max > 0 && (
         <Section title="Price">
           <p className="text-sm text-muted-foreground">
             The highest price is {formatINR(max)}
@@ -184,7 +186,7 @@ export function CollectionFilters({
       )}
 
 
-      {facets.color.length > 0 && (
+      {showColourFilter && facets.color.length > 0 && (
         <Section title="Colour">
           <OptionList
             options={facets.color}

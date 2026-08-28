@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider } from "@/lib/cart";
 import { AuthProvider } from "@/lib/auth";
 import { PriceVisibilityProvider } from "@/lib/price-visibility";
+import { FilterVisibilityProvider } from "@/lib/filter-visibility";
 import { Toaster } from "sonner";
 
 function NotFoundComponent() {
@@ -130,9 +131,11 @@ function RootComponent() {
       <AuthProvider>
         <CartProvider>
           <PriceVisibilityProvider>
-            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-            <Outlet />
-            <Toaster position="bottom-right" theme="light" />
+            <FilterVisibilityProvider>
+              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+              <Outlet />
+              <Toaster position="bottom-right" theme="light" />
+            </FilterVisibilityProvider>
           </PriceVisibilityProvider>
         </CartProvider>
       </AuthProvider>
