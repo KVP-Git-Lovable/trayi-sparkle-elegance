@@ -223,23 +223,27 @@ function ProductPage() {
             </div>
           )}
 
-          <div className={`${hasOffer ? "mt-3" : "mt-6"} flex items-baseline gap-3`}>
-            <span className="font-display text-3xl">{formatINR(price)}</span>
-            {hasOffer ? (
-              <span className="text-sm text-muted-foreground line-through">{formatINR(listPrice)}</span>
-            ) : (
-              mrp && (
-                <span className="text-sm text-muted-foreground line-through">{formatINR(mrp)}</span>
-              )
-            )}
-          </div>
-          {hasOffer && (
-            <p className="mt-1 text-sm font-medium text-green-600">
-              You save {formatINR(schemePricing!.discountAmount)}
-            </p>
-          )}
+          {!hidePrices && (
+            <>
+              <div className={`${hasOffer ? "mt-3" : "mt-6"} flex items-baseline gap-3`}>
+                <span className="font-display text-3xl">{formatINR(price)}</span>
+                {hasOffer ? (
+                  <span className="text-sm text-muted-foreground line-through">{formatINR(listPrice)}</span>
+                ) : (
+                  mrp && (
+                    <span className="text-sm text-muted-foreground line-through">{formatINR(mrp)}</span>
+                  )
+                )}
+              </div>
+              {hasOffer && (
+                <p className="mt-1 text-sm font-medium text-green-600">
+                  You save {formatINR(schemePricing!.discountAmount)}
+                </p>
+              )}
 
-          <p className="mt-1 text-xs text-muted-foreground">Inclusive of all taxes · Estimated for base configuration</p>
+              <p className="mt-1 text-xs text-muted-foreground">Inclusive of all taxes · Estimated for base configuration</p>
+            </>
+          )}
 
           <p className="mt-6 text-sm text-foreground/80 leading-relaxed">{product.description}</p>
 
