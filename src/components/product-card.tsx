@@ -5,6 +5,7 @@ import { formatINR, type Product } from "@/lib/catalog";
 import { usePriceVisibility } from "@/lib/price-visibility";
 import { useWishlist } from "@/lib/wishlist";
 import { useAuth } from "@/lib/auth";
+import { useState } from "react";
 
 export function ProductCard({ product }: { product: Product }) {
   const { hidePrices } = usePriceVisibility();
@@ -12,6 +13,7 @@ export function ProductCard({ product }: { product: Product }) {
   const { user } = useAuth();
   const { has, toggle } = useWishlist();
   const saved = has(product.id);
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
 
   const offer = product.offer;
   const offerPrice = offer?.offerPrice;
@@ -38,9 +40,14 @@ export function ProductCard({ product }: { product: Product }) {
       return;
     }
 
-    const result = await toggle(product, displayPrice);
-    if (result === "added") toast.success(`${product.name} saved to your wishlist`);
-    if (result === "removed") toast.success("Removed from your wishlist");
+    setIsWishlistLoading(true);
+    try {
+      const result = await toggle(product, displayPrice);
+      if (result === "added") toast.success(`${product.name} saved to your wishlist`);
+      if (result === "removed") toast.success("Removed from your wishlist");
+    } finally {
+      setIsWishlistLoading(false);
+    }
   };
 
   return (
@@ -69,8 +76,11 @@ export function ProductCard({ product }: { product: Product }) {
         )}
         <button
           onClick={onWishlistClick}
+          disabled={isWishlistLoading}
           aria-pressed={saved}
-          className="absolute right-3 top-3 z-20 p-2 hover:text-accent transition-colors"
+          className={`absolute right-3 top-3 z-20 p-2 hover:text-accent transition-colors ${
+            isWishlistLoading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
           aria-label={saved ? "Remove from wishlist" : "Add to wishlist"}
         >
           <Heart

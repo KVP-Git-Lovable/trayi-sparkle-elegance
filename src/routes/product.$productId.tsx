@@ -148,6 +148,7 @@ function ProductPage() {
   const { user } = useAuth();
   const { has, toggle } = useWishlist();
   const saved = has(product.id);
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
 
   const onWishlist = async () => {
     if (!user) {
@@ -155,9 +156,14 @@ function ProductPage() {
       navigate({ to: "/login" });
       return;
     }
-    const result = await toggle(product, price);
-    if (result === "added") toast.success(`${product.name} saved to your wishlist`);
-    if (result === "removed") toast.success("Removed from your wishlist");
+    setIsWishlistLoading(true);
+    try {
+      const result = await toggle(product, price);
+      if (result === "added") toast.success(`${product.name} saved to your wishlist`);
+      if (result === "removed") toast.success("Removed from your wishlist");
+    } finally {
+      setIsWishlistLoading(false);
+    }
   };
 
   const onShare = async () => {
@@ -339,8 +345,11 @@ function ProductPage() {
           <div className="mt-4 flex gap-6 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
             <button
               onClick={onWishlist}
+              disabled={isWishlistLoading}
               aria-pressed={saved}
-              className={`inline-flex items-center gap-2 hover:text-accent ${saved ? "text-accent" : ""}`}
+              className={`inline-flex items-center gap-2 hover:text-accent transition-opacity ${
+                saved ? "text-accent" : ""
+              } ${isWishlistLoading ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               <Heart className={`h-4 w-4 ${saved ? "fill-current" : ""}`} /> {saved ? "Saved" : "Wishlist"}
             </button>
