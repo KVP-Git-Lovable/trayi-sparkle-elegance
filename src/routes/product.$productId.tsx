@@ -81,6 +81,7 @@ function ProductPage() {
   const { product, related } = Route.useLoaderData() as { product: Product; related: Product[] };
   const navigate = useNavigate();
   const { add } = useCart();
+  const { hidePrices } = usePriceVisibility();
 
   const productCode = extractProductCode(product.image);
 
