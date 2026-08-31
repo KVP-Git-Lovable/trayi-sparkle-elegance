@@ -242,113 +242,80 @@ async function getWebsiteInfo(): Promise<TrustedContext['website_info']> {
 export async function buildTrustedContext(searchTerm?: string): Promise<TrustedContext> {
   const context: TrustedContext = {};
 
-  // Detect search intent from query
-  const intent = searchTerm ? analyzeSearchIntent(searchTerm) : null;
-
-  // Build context based on intent
   try {
-    switch (intent?.type) {
-      case 'attribute':
-        // For attribute queries, include all unique values
-        if (intent.key === 'color') {
-          context.globalAttributes = {
-            colors: await getAllColors(),
-            metals: await getAllColors(),
-            purities: await getAllPurities(),
-            sizes: await getAllSizes(),
-            caratRanges: await getCaratRanges(),
-          };
-        } else if (intent.key === 'purity') {
-          context.globalAttributes = {
-            colors: await getAllColors(),
-            metals: await getAllColors(),
-            purities: await getAllPurities(),
-            sizes: await getAllSizes(),
-            caratRanges: await getCaratRanges(),
-          };
-        } else if (intent.key === 'size') {
-          context.globalAttributes = {
-            colors: await getAllColors(),
-            metals: await getAllColors(),
-            purities: await getAllPurities(),
-            sizes: await getAllSizes(),
-            caratRanges: await getCaratRanges(),
-          };
-        } else if (intent.key === 'carat') {
-          context.globalAttributes = {
-            colors: await getAllColors(),
-            metals: await getAllColors(),
-            purities: await getAllPurities(),
-            sizes: await getAllSizes(),
-            caratRanges: await getCaratRanges(),
-          };
-        } else {
-          // Default to all attributes
-          context.globalAttributes = {
-            colors: await getAllColors(),
-            metals: await getAllColors(),
-            purities: await getAllPurities(),
-            sizes: await getAllSizes(),
-            caratRanges: await getCaratRanges(),
-          };
-        }
-        break;
+    // ALWAYS include global attributes - these are always relevant
+    console.log('[Chat Context] Loading global attributes...');
+    context.globalAttributes = {
+      colors: await getAllColors(),
+      metals: await getAllColors(),
+      purities: await getAllPurities(),
+      sizes: await getAllSizes(),
+      caratRanges: await getCaratRanges(),
+    };
+    console.log('[Chat Context] Global attributes loaded:', {
+      colors: context.globalAttributes.colors.length,
+      purities: context.globalAttributes.purities.length,
+      sizes: context.globalAttributes.sizes.length,
+    });
 
-      case 'collection':
-        // For collection queries, include collection info
-        const allCollections = await getCollections();
-        context.collections = allCollections.map(c => ({
-          name: c.name,
-          productCount: c.count,
-          examples: c.examples,
-        }));
-        context.globalAttributes = {
-          colors: await getAllColors(),
-          metals: await getAllColors(),
-          purities: await getAllPurities(),
-          sizes: await getAllSizes(),
-          caratRanges: await getCaratRanges(),
-        };
-        break;
+    // Detect search intent from query to add additional context
+    if (searchTerm) {
+      console.log('[Chat Context] Search term provided:', searchTerm);
+      const intent = analyzeSearchIntent(searchTerm);
+      console.log('[Chat Context] Detected intent:', intent.type, intent.key || intent.query);
 
-      case 'product':
-        // For product queries, search for matching products
-        if (intent.query) {
-          context.products = await searchProducts(intent.query);
-        }
-        context.globalAttributes = {
-          colors: await getAllColors(),
-          metals: await getAllColors(),
-          purities: await getAllPurities(),
-          sizes: await getAllSizes(),
-          caratRanges: await getCaratRanges(),
-        };
-        break;
+      switch (intent.type) {
+        case 'collection':
+          // For collection queries, include collection info
+          const allCollections = await getCollections();
+          context.collections = allCollections.map(c => ({
+            name: c.name,
+            productCount: c.count,
+            examples: c.examples,
+          }));
+          console.log('[Chat Context] Added collection context');
+          break;
 
-      default:
-        // For general queries, include full context
-        if (searchTerm) {
-          context.products = await searchProducts(searchTerm);
-        }
-        context.globalAttributes = {
-          colors: await getAllColors(),
-          metals: await getAllColors(),
-          purities: await getAllPurities(),
-          sizes: await getAllSizes(),
-          caratRanges: await getCaratRanges(),
-        };
-        context.collections = (await getCollections()).map(c => ({
-          name: c.name,
-          productCount: c.count,
-          examples: c.examples,
-        }));
+        case 'product':
+          // For product queries, search for matching products
+          if (intent.query) {
+            context.products = await searchProducts(intent.query);
+            console.log('[Chat Context] Found products:', context.products?.length);
+          }
+          break;
+
+        case 'attribute':
+        case 'general':
+        default:
+          // For other queries, do additional product search if meaningful
+          if (searchTerm && searchTerm.length > 2) {
+            context.products = await searchProducts(searchTerm);
+            console.log('[Chat Context] Searched products for general query');
+          }
+          break;
+      }
     }
 
     // Always include catalog statistics and website info
     context.catalog_stats = await getCatalogStats();
     context.website_info = await getWebsiteInfo();
+
+    console.log('[Chat Context] Context build complete');
   } catch (error) {
-    console.error('Error building trusted context:', error);
+    console.error('[Chat Context] Error building trusted context:', error);
+    // Fallback - still try to include global attributes
+    try {
+      context.globalAttributes = {
+        colors: await getAllColors(),
+        metals: await getAllColors(),
+        purities: await getAllPurities(),
+        sizes: await getAllSizes(),
+        caratRanges: await getCaratRanges(),
+      };
+    } catch (fallbackError) {
+      console.error('[Chat Context] Fallback also failed:', fallbackError);
+    }
+
     // Fallback to basic context
     context.catalog_stats = await getCatalogStats();
     context.website_info = await getWebsiteInfo();

@@ -225,19 +225,27 @@ function buildProductMap(products: any[]): Map<string, any> {
  */
 async function buildCatalogIndex(): Promise<CatalogIndex> {
   try {
+    console.log('[Catalog Index] Starting build...');
+
     // Fetch all active products from POS database
-    const { data, error } = await posSupabase
+    const { data, error, count } = await posSupabase
       .from('catalog_products')
-      .select('id, title, description, product_type, options, variants, tags, base_price, display_price, diamondCt, metalOptions, purityOptions')
+      .select('id, title, description, product_type, options, variants, tags, base_price, display_price, diamondCt, metalOptions, purityOptions', { count: 'exact' })
       .eq('status', 'active')
       .limit(1000);
 
-    if (error || !data) {
-      console.warn('Catalog index build failed:', error);
-      throw new Error('Failed to fetch products');
+    if (error) {
+      console.error('[Catalog Index] Database error:', error);
+      throw error;
     }
 
     const products = data || [];
+    console.log(`[Catalog Index] Fetched ${products.length} products (total count: ${count})`);
+
+    if (products.length === 0) {
+      console.warn('[Catalog Index] No products found, returning fallback data');
+      return getDefaultIndex();
+    }
 
     // Extract all attributes
     const colors = extractColors(products);
@@ -247,6 +255,10 @@ async function buildCatalogIndex(): Promise<CatalogIndex> {
     const caratRanges = extractCaratRanges(products);
     const collections = extractCollections(products);
     const productsByName = buildProductMap(products);
+
+    console.log(`[Catalog Index] Extracted: ${colors.size} colors, ${purities.size} purities, ${sizes.size} sizes`);
+    console.log(`[Catalog Index] Colors:`, Array.from(colors).join(', '));
+    console.log(`[Catalog Index] Purities:`, Array.from(purities).join(', '));
 
     return {
       colors: Array.from(colors).sort(),
@@ -259,9 +271,33 @@ async function buildCatalogIndex(): Promise<CatalogIndex> {
       lastUpdated: Date.now(),
     };
   } catch (error) {
-    console.error('Catalog index build error:', error);
-    throw error;
+    console.error('[Catalog Index] Build failed, using fallback:', error);
+    return getDefaultIndex();
   }
+}
+
+/**
+ * Get default/fallback catalog index
+ * Used when database fetch fails
+ */
+function getDefaultIndex(): CatalogIndex {
+  return {
+    colors: ['Rose Gold', 'Yellow Gold', 'White Gold'],
+    metals: ['Rose Gold', 'Yellow Gold', 'White Gold'],
+    purities: ['9KT', '14KT', '18KT'],
+    sizes: ['8', '9', '10', '11', '12', '13', '14', '15', '16'],
+    caratRanges: ['Below 1 ct', '1-2 ct', '2-3 ct', '3 ct+'],
+    collections: new Map([
+      ['Rings', { count: 0, examples: ['Diamond Ring', 'Gold Ring'] }],
+      ['Earrings', { count: 0, examples: ['Diamond Earrings', 'Gold Earrings'] }],
+      ['Pendants', { count: 0, examples: ['Diamond Pendant', 'Gold Pendant'] }],
+      ['Necklaces', { count: 0, examples: ['Diamond Necklace', 'Gold Necklace'] }],
+      ['Bracelets', { count: 0, examples: ['Diamond Bracelet', 'Gold Bracelet'] }],
+      ['Tanmaniya', { count: 0, examples: ['Tanmaniya'] }],
+    ]),
+    productsByName: new Map(),
+    lastUpdated: Date.now(),
+  };
 }
 
 /**
