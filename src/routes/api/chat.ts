@@ -27,9 +27,9 @@ const AI_MODEL = 'openai/gpt-5.6-sol';
 const MAX_MESSAGE_LENGTH = 500;
 const MAX_HISTORY_MESSAGES = 10;
 const MAX_HISTORY_TOKENS = 2000;
-const REQUEST_TIMEOUT_MS = 30000;
 const RATE_LIMIT_REQUESTS = 10;
 const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+const AI_GATEWAY_MAX_ATTEMPTS = 3;
 
 // Simple in-memory rate limiting (replace with Redis in production)
 const rateLimitMap = new Map<string, number[]>();
@@ -142,6 +142,36 @@ type ResponsesOutput = {
   output?: Array<{ content?: Array<{ type?: string; text?: string }> }>;
 };
 
+class AiGatewayError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly retryAfterSeconds?: number,
+  ) {
+    super(message);
+    this.name = 'AiGatewayError';
+  }
+}
+
+function gatewayErrorMessage(detail: string, status: number): string {
+  try {
+    const parsed = JSON.parse(detail) as { error?: { message?: unknown }; message?: unknown };
+    const message = parsed.error?.message ?? parsed.message;
+    if (typeof message === 'string' && message.trim()) return message.trim();
+  } catch {
+    // Use the response text or status fallback below.
+  }
+
+  return detail.trim() || `AI service returned HTTP ${status}`;
+}
+
+function retryDelayMs(attempt: number, retryAfterSeconds?: number): number {
+  if (retryAfterSeconds !== undefined && Number.isFinite(retryAfterSeconds)) {
+    return Math.max(0, retryAfterSeconds * 1000);
+  }
+  return 500 * 2 ** (attempt - 1) + Math.floor(Math.random() * 250);
+}
+
 // Call Lovable AI Gateway (Responses API)
 async function callAiGateway(
   apiKey: string,
@@ -159,10 +189,7 @@ async function callAiGateway(
     })),
   };
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
-  try {
+  for (let attempt = 1; attempt <= AI_GATEWAY_MAX_ATTEMPTS; attempt += 1) {
     const response = await fetch(AI_GATEWAY_URL, {
       method: 'POST',
       headers: {
@@ -170,15 +197,27 @@ async function callAiGateway(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
-      signal: controller.signal,
     });
 
     if (!response.ok) {
       const detail = await response.text().catch(() => '');
       console.error(`AI gateway error ${response.status}: ${detail}`);
-      if (response.status === 429) throw new Error('Too many requests. Please try again in a moment.');
-      if (response.status === 402) throw new Error('AI credits are exhausted. Please contact the store.');
-      throw new Error('AI service error');
+      const retryAfterHeader = response.headers.get('retry-after');
+      const retryAfterSeconds = retryAfterHeader ? Number(retryAfterHeader) : undefined;
+      const isRetryable = response.status === 429 || response.status >= 500;
+
+      if (isRetryable && attempt < AI_GATEWAY_MAX_ATTEMPTS) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, retryDelayMs(attempt, retryAfterSeconds)),
+        );
+        continue;
+      }
+
+      throw new AiGatewayError(
+        gatewayErrorMessage(detail, response.status),
+        response.status,
+        retryAfterSeconds,
+      );
     }
 
     const data = (await response.json()) as ResponsesOutput;
@@ -196,16 +235,9 @@ async function callAiGateway(
     }
 
     return cleanText(text).trim();
-  } catch (error) {
-    if (error instanceof Error && error.name === 'AbortError') {
-      console.error('AI gateway request timeout');
-      throw new Error('Request timeout');
-    }
-    console.error('AI gateway error:', error);
-    throw error instanceof Error ? error : new Error('AI service unavailable');
-  } finally {
-    clearTimeout(timeout);
   }
+
+  throw new AiGatewayError('AI service temporarily unavailable', 503);
 }
 
 // Main handler
@@ -298,6 +330,19 @@ async function handleChat({ request }: { request: Request }): Promise<Response> 
     const message = error instanceof Error ? error.message : 'Unknown error';
 
     console.error('Chat API error:', message);
+
+    if (error instanceof AiGatewayError) {
+      return json(
+        { error: message },
+        {
+          status: error.status,
+          headers:
+            error.retryAfterSeconds !== undefined
+              ? { 'Retry-After': String(error.retryAfterSeconds) }
+              : undefined,
+        },
+      );
+    }
 
     // Return generic error message (never expose internals)
     return json(
