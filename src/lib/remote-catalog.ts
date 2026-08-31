@@ -2,6 +2,12 @@ import { posSupabase } from "./pos-supabase";
 import type { Product } from "./catalog";
 import { evaluateApplicableSchemes, type Scheme } from "./pos-schemes";
 import { cleanText } from "./text-clean";
+import earringDescriptions from "@/data/earring-descriptions.json";
+
+// Rewritten copy for earrings whose stored description is unrecoverably garbled.
+// Keyed by product handle; display-only, the POS data is untouched.
+const EARRING_DESCRIPTIONS = earringDescriptions as Record<string, string>;
+
 
 type CatalogRow = {
   id: string;
