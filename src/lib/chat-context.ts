@@ -18,6 +18,11 @@ export interface TrustedContext {
     purity_options?: string[];
     url: string;
   }>;
+  catalog_stats?: {
+    total_products: number;
+    total_collections: number;
+    collection_names: string[];
+  };
   website_info?: {
     shipping?: string;
     returns?: string;
@@ -89,6 +94,33 @@ async function searchProducts(searchTerm?: string): Promise<TrustedContext['prod
 }
 
 /**
+ * Retrieve catalog statistics
+ * Total product count and collection information
+ */
+async function getCatalogStats(): Promise<TrustedContext['catalog_stats']> {
+  try {
+    const { count } = await posSupabase
+      .from('catalog_products')
+      .select('*', { count: 'exact', head: true });
+
+    const collections = ['Rings', 'Earrings', 'Pendants', 'Necklaces', 'Bracelets'];
+
+    return {
+      total_products: count || 0,
+      total_collections: collections.length,
+      collection_names: collections,
+    };
+  } catch (error) {
+    console.error('Catalog stats error:', error);
+    return {
+      total_products: 0,
+      total_collections: 5,
+      collection_names: ['Rings', 'Earrings', 'Pendants', 'Necklaces', 'Bracelets'],
+    };
+  }
+}
+
+/**
  * Retrieve website configuration and policies
  * These are static, verified facts about the business
  */
@@ -152,6 +184,9 @@ export async function buildTrustedContext(
   if (searchTerm) {
     context.products = await searchProducts(searchTerm);
   }
+
+  // Always include catalog statistics (product count, collections)
+  context.catalog_stats = await getCatalogStats();
 
   // Always include website info (policies, contact, etc.)
   context.website_info = await getWebsiteInfo();
