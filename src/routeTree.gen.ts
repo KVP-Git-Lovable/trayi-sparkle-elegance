@@ -23,6 +23,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CollectionsIndexRouteImport } from './routes/collections.index'
 import { Route as ProductProductIdRouteImport } from './routes/product.$productId'
 import { Route as CollectionsCategoryRouteImport } from './routes/collections.$category'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 
 const TermsAndConditionsRoute = TermsAndConditionsRouteImport.update({
@@ -94,6 +95,11 @@ const CollectionsCategoryRoute = CollectionsCategoryRouteImport.update({
   path: '/collections/$category',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/api/chat': typeof ApiChatRoute
   '/collections/$category': typeof CollectionsCategoryRoute
   '/product/$productId': typeof ProductProductIdRoute
   '/collections/': typeof CollectionsIndexRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/api/chat': typeof ApiChatRoute
   '/collections/$category': typeof CollectionsCategoryRoute
   '/product/$productId': typeof ProductProductIdRoute
   '/collections': typeof CollectionsIndexRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/api/chat': typeof ApiChatRoute
   '/collections/$category': typeof CollectionsCategoryRoute
   '/product/$productId': typeof ProductProductIdRoute
   '/collections/': typeof CollectionsIndexRoute
@@ -164,6 +173,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/terms-and-conditions'
     | '/account'
+    | '/api/chat'
     | '/collections/$category'
     | '/product/$productId'
     | '/collections/'
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/terms-and-conditions'
     | '/account'
+    | '/api/chat'
     | '/collections/$category'
     | '/product/$productId'
     | '/collections'
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/terms-and-conditions'
     | '/_authenticated/account'
+    | '/api/chat'
     | '/collections/$category'
     | '/product/$productId'
     | '/collections/'
@@ -214,6 +226,7 @@ export interface RootRouteChildren {
   OrderConfirmationRoute: typeof OrderConfirmationRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermsAndConditionsRoute: typeof TermsAndConditionsRoute
+  ApiChatRoute: typeof ApiChatRoute
   CollectionsCategoryRoute: typeof CollectionsCategoryRoute
   ProductProductIdRoute: typeof ProductProductIdRoute
   CollectionsIndexRoute: typeof CollectionsIndexRoute
@@ -319,6 +332,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CollectionsCategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/account': {
       id: '/_authenticated/account'
       path: '/account'
@@ -352,6 +372,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrderConfirmationRoute: OrderConfirmationRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TermsAndConditionsRoute: TermsAndConditionsRoute,
+  ApiChatRoute: ApiChatRoute,
   CollectionsCategoryRoute: CollectionsCategoryRoute,
   ProductProductIdRoute: ProductProductIdRoute,
   CollectionsIndexRoute: CollectionsIndexRoute,
