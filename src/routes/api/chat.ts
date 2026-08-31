@@ -19,10 +19,9 @@ const json = (data: unknown, init?: ResponseInit) =>
   });
 
 
-// Environment variables (server-side only)
-const TOGETHER_AI_KEY = process.env.TOGETHER_AI_KEY;
-const TOGETHER_API_URL = 'https://api.together.xyz/inference';
-const TOGETHER_MODEL = 'meta-llama/Meta-Llama-3-8B-Instruct-Turbo';
+// Lovable AI Gateway (server-side only)
+const AI_GATEWAY_URL = 'https://ai.gateway.lovable.dev/v1/responses';
+const AI_MODEL = 'openai/gpt-5.6-sol';
 
 // Configuration
 const MAX_MESSAGE_LENGTH = 500;
