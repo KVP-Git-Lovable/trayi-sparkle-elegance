@@ -18,15 +18,24 @@ export async function sendChatMessage(
   request: ChatRequest
 ): Promise<ChatResponse> {
   try {
+    // Build messages array: add new user message to history
+    const messages = [
+      ...(request.conversationHistory || []).map(msg => ({
+        role: msg.role as 'user' | 'assistant',
+        content: msg.content,
+      })),
+      {
+        role: 'user' as const,
+        content: request.message,
+      },
+    ];
+
     const response = await fetch("/api/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        message: request.message,
-        conversationHistory: request.conversationHistory || [],
-      }),
+      body: JSON.stringify({ messages }),
     });
 
     if (!response.ok) {
