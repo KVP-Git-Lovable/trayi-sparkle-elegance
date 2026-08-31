@@ -162,7 +162,8 @@ async function callTogetherAI(
 }
 
 // Main handler
-export const POST: RequestHandler = async ({ request }) => {
+async function handleChat({ request }: { request: Request }): Promise<Response> {
+
   try {
     // Check prerequisites
     if (!TOGETHER_AI_KEY) {
