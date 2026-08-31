@@ -66,14 +66,20 @@ async function searchProducts(searchTerm?: string): Promise<TrustedContext['prod
   }
 
   try {
-    const searchPattern = `%${searchTerm}%`;
+    const safeSearchTerm = searchTerm
+      .replace(/[,%(){}]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 100);
+    if (!safeSearchTerm) return undefined;
+    const searchPattern = `%${safeSearchTerm}%`;
 
     // Search by product title, product_type (collection), or tags
     const { data, error } = await posSupabase
       .from('catalog_products')
       .select('id, title, description, product_type, options, tags')
       .or(
-        `title.ilike.${searchPattern},product_type.ilike.${searchPattern},tags.cs.{"${searchTerm.toLowerCase()}"}`
+        `title.ilike.${searchPattern},product_type.ilike.${searchPattern}`
       )
       .limit(5);
 
@@ -86,7 +92,7 @@ async function searchProducts(searchTerm?: string): Promise<TrustedContext['prod
     if (data.length === 0) {
       const { data: titleData } = await posSupabase
         .from('catalog_products')
-        .select('id, title, description, product_type, options')
+        .select('id, title, description, product_type, options, tags')
         .ilike('title', searchPattern)
         .limit(5);
 
