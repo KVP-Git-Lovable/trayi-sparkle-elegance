@@ -201,7 +201,11 @@ function mapRow(row: CatalogRow): Product {
     sizeLabel: sizes ? SIZE_LABEL[slug] ?? "Size" : undefined,
     image,
     gallery: image ? [image] : [],
-    description: cleanText(stripHtml(row.description)) || cleanText(row.title),
+    description:
+      EARRING_DESCRIPTIONS[row.handle] ||
+      cleanText(stripHtml(row.description)) ||
+      cleanText(row.title),
+
     sku,
     weightGm: 0,
     diamondCt: 0,
