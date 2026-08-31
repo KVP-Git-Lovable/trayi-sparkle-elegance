@@ -65,6 +65,29 @@ function checkRateLimit(clientId: string): boolean {
 function buildSystemPrompt(context: Awaited<ReturnType<typeof buildTrustedContext>>): string {
   const contextStr = JSON.stringify(context, null, 2);
 
+  // Build attribute summaries for the prompt
+  const attributesSummary = context.globalAttributes
+    ? `
+CATALOG ATTRIBUTES (Actual Product Data):
+- Available Metal Colors: ${context.globalAttributes.colors?.join(', ') || 'Not available'}
+- Available Purities: ${context.globalAttributes.purities?.join(', ') || 'Not available'}
+- Available Sizes: ${context.globalAttributes.sizes?.join(', ') || 'Not available'}
+- Available Carat Ranges: ${context.globalAttributes.caratRanges?.join(', ') || 'Not available'}
+`
+    : '';
+
+  const collectionsSummary = context.collections
+    ? `
+COLLECTIONS:
+${context.collections
+  .map(
+    c =>
+      `- ${c.name} (${c.productCount} products): ${c.examples.slice(0, 2).join(', ')}${c.examples.length > 2 ? ', and more' : ''}`
+  )
+  .join('\n')}
+`
+    : '';
+
   return `You are a helpful AI assistant for Trayi Jewellery, an exclusive Limelight Diamonds boutique in Mangalore.
 
 CRITICAL RULES:
@@ -75,6 +98,14 @@ CRITICAL RULES:
 - Keep responses concise, clear, and respectful
 - When answering about product counts or collections, be polite and welcoming
 
+ANSWER PATTERNS:
+1. For "How many color variations?" → List the actual unique colors available
+2. For "What metals available?" → List unique metals from metalOptions
+3. For "What purity options?" → List unique purities (9KT, 14KT, 18KT)
+4. For "What size options?" → List unique sizes across products
+5. For product-specific questions → Provide details from the product data
+6. For collection questions → Describe the collection with product counts
+7. For other questions → Use facts from the trusted context${attributesSummary}${collectionsSummary}
 TRUSTED CONTEXT:
 ${contextStr}
 

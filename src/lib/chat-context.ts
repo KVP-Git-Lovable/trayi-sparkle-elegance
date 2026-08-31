@@ -4,12 +4,30 @@
  * Retrieves trusted, verified product and website information
  * to ground AI responses in actual catalog data.
  *
- * Never sends entire catalog - only relevant context for the user's query.
+ * Integrates catalog index for comprehensive attribute extraction
+ * and search intent detection for intelligent context building.
  */
 
 import { posSupabase } from './pos-supabase';
+import {
+  getCatalogIndex,
+  getAllColors,
+  getAllPurities,
+  getAllSizes,
+  getCaratRanges,
+  getCollections,
+  searchProductsByName,
+} from './catalog-index';
+import { analyzeSearchIntent, extractKeywords } from './search-intent';
 
 export interface TrustedContext {
+  globalAttributes?: {
+    colors: string[];
+    metals: string[];
+    purities: string[];
+    sizes: string[];
+    caratRanges: string[];
+  };
   products?: Array<{
     name: string;
     description: string;
@@ -17,6 +35,11 @@ export interface TrustedContext {
     metal_options?: string[];
     purity_options?: string[];
     url: string;
+  }>;
+  collections?: Array<{
+    name: string;
+    productCount: number;
+    examples: string[];
   }>;
   catalog_stats?: {
     total_products: number;
@@ -210,24 +233,126 @@ async function getWebsiteInfo(): Promise<TrustedContext['website_info']> {
 /**
  * Build complete trusted context for AI assistant
  *
- * This function retrieves only the context needed for the user's query,
- * avoiding the overhead of loading the entire catalog.
+ * Intelligently builds context based on detected search intent:
+ * - Attribute queries: Include all unique values (colors, purities, etc.)
+ * - Product queries: Include matching product details
+ * - Collection queries: Include collection info
+ * - General queries: Include catalog stats and website info
  */
-export async function buildTrustedContext(
-  searchTerm?: string
-): Promise<TrustedContext> {
+export async function buildTrustedContext(searchTerm?: string): Promise<TrustedContext> {
   const context: TrustedContext = {};
 
-  // Search for products if user asked about something specific
-  if (searchTerm) {
-    context.products = await searchProducts(searchTerm);
+  // Detect search intent from query
+  const intent = searchTerm ? analyzeSearchIntent(searchTerm) : null;
+
+  // Build context based on intent
+  try {
+    switch (intent?.type) {
+      case 'attribute':
+        // For attribute queries, include all unique values
+        if (intent.key === 'color') {
+          context.globalAttributes = {
+            colors: await getAllColors(),
+            metals: await getAllColors(),
+            purities: await getAllPurities(),
+            sizes: await getAllSizes(),
+            caratRanges: await getCaratRanges(),
+          };
+        } else if (intent.key === 'purity') {
+          context.globalAttributes = {
+            colors: await getAllColors(),
+            metals: await getAllColors(),
+            purities: await getAllPurities(),
+            sizes: await getAllSizes(),
+            caratRanges: await getCaratRanges(),
+          };
+        } else if (intent.key === 'size') {
+          context.globalAttributes = {
+            colors: await getAllColors(),
+            metals: await getAllColors(),
+            purities: await getAllPurities(),
+            sizes: await getAllSizes(),
+            caratRanges: await getCaratRanges(),
+          };
+        } else if (intent.key === 'carat') {
+          context.globalAttributes = {
+            colors: await getAllColors(),
+            metals: await getAllColors(),
+            purities: await getAllPurities(),
+            sizes: await getAllSizes(),
+            caratRanges: await getCaratRanges(),
+          };
+        } else {
+          // Default to all attributes
+          context.globalAttributes = {
+            colors: await getAllColors(),
+            metals: await getAllColors(),
+            purities: await getAllPurities(),
+            sizes: await getAllSizes(),
+            caratRanges: await getCaratRanges(),
+          };
+        }
+        break;
+
+      case 'collection':
+        // For collection queries, include collection info
+        const allCollections = await getCollections();
+        context.collections = allCollections.map(c => ({
+          name: c.name,
+          productCount: c.count,
+          examples: c.examples,
+        }));
+        context.globalAttributes = {
+          colors: await getAllColors(),
+          metals: await getAllColors(),
+          purities: await getAllPurities(),
+          sizes: await getAllSizes(),
+          caratRanges: await getCaratRanges(),
+        };
+        break;
+
+      case 'product':
+        // For product queries, search for matching products
+        if (intent.query) {
+          context.products = await searchProducts(intent.query);
+        }
+        context.globalAttributes = {
+          colors: await getAllColors(),
+          metals: await getAllColors(),
+          purities: await getAllPurities(),
+          sizes: await getAllSizes(),
+          caratRanges: await getCaratRanges(),
+        };
+        break;
+
+      default:
+        // For general queries, include full context
+        if (searchTerm) {
+          context.products = await searchProducts(searchTerm);
+        }
+        context.globalAttributes = {
+          colors: await getAllColors(),
+          metals: await getAllColors(),
+          purities: await getAllPurities(),
+          sizes: await getAllSizes(),
+          caratRanges: await getCaratRanges(),
+        };
+        context.collections = (await getCollections()).map(c => ({
+          name: c.name,
+          productCount: c.count,
+          examples: c.examples,
+        }));
+    }
+
+    // Always include catalog statistics and website info
+    context.catalog_stats = await getCatalogStats();
+    context.website_info = await getWebsiteInfo();
+  } catch (error) {
+    console.error('Error building trusted context:', error);
+    // Fallback to basic context
+    context.catalog_stats = await getCatalogStats();
+    context.website_info = await getWebsiteInfo();
   }
-
-  // Always include catalog statistics (product count, collections)
-  context.catalog_stats = await getCatalogStats();
-
-  // Always include website info (policies, contact, etc.)
-  context.website_info = await getWebsiteInfo();
 
   return context;
 }
