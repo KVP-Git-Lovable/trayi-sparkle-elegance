@@ -34,7 +34,8 @@ export interface TrustedContext {
 
 /**
  * Search catalog for products matching user query
- * Returns only top 3-5 relevant results to avoid overwhelming context
+ * Searches by product name, collection type, and tags
+ * Returns only top 5 relevant results to avoid overwhelming context
  */
 async function searchProducts(searchTerm?: string): Promise<TrustedContext['products']> {
   if (!searchTerm || searchTerm.length < 2) {
@@ -42,15 +43,32 @@ async function searchProducts(searchTerm?: string): Promise<TrustedContext['prod
   }
 
   try {
+    const searchPattern = `%${searchTerm}%`;
+
+    // Search by product title, product_type (collection), or tags
     const { data, error } = await posSupabase
       .from('catalog_products')
-      .select('id, title, description, product_type, options')
-      .ilike('title', `%${searchTerm}%`)
+      .select('id, title, description, product_type, options, tags')
+      .or(
+        `title.ilike.${searchPattern},product_type.ilike.${searchPattern},tags.cs.{"${searchTerm.toLowerCase()}"}`
+      )
       .limit(5);
 
     if (error || !data) {
       console.warn('Product search failed:', error);
       return undefined;
+    }
+
+    // If no results, try broader search on just title
+    if (data.length === 0) {
+      const { data: titleData } = await posSupabase
+        .from('catalog_products')
+        .select('id, title, description, product_type, options')
+        .ilike('title', searchPattern)
+        .limit(5);
+
+      if (!titleData) return undefined;
+      data.push(...titleData);
     }
 
     return data.map((product: any) => {
@@ -95,20 +113,42 @@ async function searchProducts(searchTerm?: string): Promise<TrustedContext['prod
 
 /**
  * Retrieve catalog statistics
- * Total product count and collection information
+ * Total product count and dynamically fetched collection information
  */
 async function getCatalogStats(): Promise<TrustedContext['catalog_stats']> {
   try {
+    // Get total product count
     const { count } = await posSupabase
       .from('catalog_products')
       .select('*', { count: 'exact', head: true });
 
-    const collections = ['Rings', 'Earrings', 'Pendants', 'Necklaces', 'Bracelets'];
+    // Get distinct collections from product_type field
+    const { data: collectionData } = await posSupabase
+      .from('catalog_products')
+      .select('product_type', { count: 'exact' })
+      .neq('product_type', null);
+
+    // Extract unique collection names and sort them
+    const collections = Array.from(
+      new Set(
+        collectionData
+          ?.map((item: any) => item.product_type)
+          .filter((type: string) => type && type.length > 0)
+          .map((type: string) =>
+            type
+              .split('_')
+              .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+              .join(' ')
+          ) || ['Rings', 'Earrings', 'Pendants', 'Necklaces', 'Bracelets']
+      )
+    ).sort();
+
+    const finalCollections = collections.length > 0 ? collections : ['Rings', 'Earrings', 'Pendants', 'Necklaces', 'Bracelets'];
 
     return {
       total_products: count || 0,
-      total_collections: collections.length,
-      collection_names: collections,
+      total_collections: finalCollections.length,
+      collection_names: finalCollections,
     };
   } catch (error) {
     console.error('Catalog stats error:', error);
@@ -155,7 +195,6 @@ async function getWebsiteInfo(): Promise<TrustedContext['website_info']> {
       returns: config.return_policy || 'Please contact support for return inquiries',
       payment: config.payment_info || 'We accept major credit cards',
       contact: config.contact_email || 'support@trayi.com',
-      collections: ['Rings', 'Earrings', 'Pendants', 'Necklaces', 'Bracelets'],
     };
   } catch (error) {
     console.error('Website config error:', error);
@@ -164,7 +203,6 @@ async function getWebsiteInfo(): Promise<TrustedContext['website_info']> {
       shipping: 'Available worldwide',
       returns: 'Please contact support for return inquiries',
       payment: 'We accept major credit cards and digital payment methods',
-      collections: ['Rings', 'Earrings', 'Pendants', 'Necklaces', 'Bracelets'],
     };
   }
 }

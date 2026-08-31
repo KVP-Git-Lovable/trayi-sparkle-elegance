@@ -243,8 +243,17 @@ async function handleChat({ request }: { request: Request }): Promise<Response> 
     // Bound conversation history
     const boundedMessages = boundHistory(validatedMessages);
 
-    // Build trusted context
-    const context = await buildTrustedContext(body.context?.searchTerm);
+    // Extract search term from user's latest message for better context
+    const lastUserMessage = validatedMessages
+      .slice()
+      .reverse()
+      .find(msg => msg.role === 'user')?.content || '';
+
+    // Use explicit search term or extract from message
+    const searchTerm = body.context?.searchTerm || lastUserMessage;
+
+    // Build trusted context with search term from user's question
+    const context = await buildTrustedContext(searchTerm);
     const systemPrompt = buildSystemPrompt(context);
 
     // Call Lovable AI
