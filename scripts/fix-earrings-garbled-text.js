@@ -1,342 +1,396 @@
 /**
- * Complete Earrings Description Fix - All Phases in One Script
+ * Rewrite garbled earring descriptions in the POS catalog.
  *
- * This script safely fixes garbled text in earrings product descriptions by:
- * 1. Backing up current data
- * 2. Identifying exactly 216 affected products
- * 3. Generating unique, contextual 3-4 line descriptions
- * 4. Validating quality
- * 5. Performing dry-run first
- * 6. Updating only affected products in database
- * 7. Verifying changes
+ *   bun scripts/fix-earrings-garbled-text.js --dry-run   # preview only
+ *   bun scripts/fix-earrings-garbled-text.js             # live update
  *
- * Usage:
- *   node scripts/fix-earrings-garbled-text.js [--dry-run]
- *
- * Options:
- *   --dry-run    : Show what would be changed without committing
- *   (no flag)    : Execute full update to database
+ * Scope: products with product_type EARRING whose description contains
+ * mojibake. Only the `description` column is written. Clean earrings and all
+ * other categories are never touched.
  */
 
-import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { cleanText } from "../src/lib/text-clean.ts";
+import { POS_URL, POS_ANON_KEY } from "../src/lib/pos-supabase.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isDryRun = process.argv.includes("--dry-run");
+const REST = `${POS_URL}/rest/v1/catalog_products`;
+const HEADERS = {
+  apikey: POS_ANON_KEY,
+  Authorization: `Bearer ${POS_ANON_KEY}`,
+  "Content-Type": "application/json",
+};
 
-const POS_URL = "https://pdtasnfsdnfttayxibqy.supabase.co";
-const POS_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkdGFzbmZzZG5mdHRheXhpYnF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjgwMjYsImV4cCI6MjA5MzAwNDAyNn0.9Lxg9whQzv7eseBabKvBzLaalTWjnZs6hkl4JfLTb-E";
+const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const AI_MODEL = "google/gemini-2.5-flash";
+const AI_KEY = process.env.LOVABLE_API_KEY;
 
-const posSupabase = createClient(POS_URL, POS_ANON_KEY, {
-  auth: { persistSession: false, autoRefreshToken: false },
-});
+const GARBLED = /Ã|Â|â€|�/;
 
-// Garbled text patterns
-const GARBLED_PATTERNS = [
-  /ÃƒÆ'Ã†â€™Ãƒâ€ 'Ã¢â‚¬Å¡Ãƒâ€š/,
-  /ÃƒÂ€ÃƒÂ¢â‚¬Å¡ÃƒÂ€âœÂ/,
-  /Ãƒâ€šÃ‚Â/,
-  /ÃƒÆ'Ã†â€™/,
-  /Ã¢â‚¬Å¡/,
-  /Ã‚Â/,
-  /Ãƒâ€š/,
-];
+const lines = [];
+const log = (m) => {
+  console.log(m);
+  lines.push(String(m));
+};
 
-// Description templates for earrings
-const DESCRIPTION_TEMPLATES = [
-  (name, metal, purity) =>
-    `Discover our exquisite ${name}, a stunning addition to any jewelry collection. Crafted with precision in ${metal} with ${purity} purity, this piece exudes grace with sheer brilliance. Each earring is meticulously designed to capture light and create a mesmerizing sparkle. Perfect for both everyday elegance and special occasions.`,
+// ---------- helpers ----------
 
-  (name, metal, purity) =>
-    `Indulge in the world of refined opulence with our ${name}. These elegant earrings showcase lab-grown diamonds set in premium ${metal}, delivering exceptional sparkle and luxury. With ${purity} purity, every detail reflects exquisite craftsmanship. Elevate your jewelry collection with this timeless piece.`,
+const stripHtml = (html) =>
+  cleanText(
+    String(html || "")
+      .replace(/<br\s*\/?>/gi, " ")
+      .replace(/<\/p>/gi, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/&amp;/gi, "&")
+      .replace(/&#39;|&rsquo;/gi, "'")
+      .replace(/&quot;|&ldquo;|&rdquo;/gi, '"')
+      .replace(/\s+/g, " ")
+  ).trim();
 
-  (name, metal, purity) =>
-    `Experience the brilliance of our ${name}, featuring lab-grown diamonds in ${metal} with ${purity} purity. This sophisticated design seamlessly blends modern elegance with timeless appeal. Each earring is crafted to perfection, making it an ideal choice for those who appreciate refined luxury and contemporary style.`,
-
-  (name, metal, purity) =>
-    `Celebrate your unique style with our ${name}, beautifully crafted in ${metal} with ${purity} purity. These earrings feature stunning lab-grown diamonds that sparkle with exceptional clarity and brilliance. Perfectly designed for both casual wear and formal occasions, they add an instant touch of elegance to any ensemble.`,
-
-  (name, metal, purity) =>
-    `Transform your look with our ${name}, a testament to fine craftsmanship and luxury. Set in premium ${metal} with ${purity} purity, these earrings showcase flawless lab-grown diamonds. The elegant design ensures comfortable wear while maintaining stunning visual impact. A perfect investment in timeless beauty.`,
-];
-
-function hasGarbledText(text) {
-  if (!text) return false;
-  return GARBLED_PATTERNS.some(pattern => pattern.test(text));
+function sentences(text) {
+  return text
+    .split(/(?<=[.!?])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
-function extractMetalAndPurity(product) {
-  let metal = "Gold";
-  let purity = "18KT";
+function trigrams(text) {
+  const t = text.toLowerCase().replace(/[^a-z0-9 ]/g, "");
+  const set = new Set();
+  for (let i = 0; i < t.length - 2; i++) set.add(t.slice(i, i + 3));
+  return set;
+}
 
-  if (product.options) {
-    const options = product.options;
-    for (const [key, values] of Object.entries(options)) {
-      const keyLower = key.toLowerCase();
-      if (
-        keyLower.includes("color") ||
-        keyLower.includes("metal") ||
-        keyLower.includes("colour")
-      ) {
-        metal = values[0] || "Gold";
-      }
-      if (
-        keyLower.includes("purity") ||
-        keyLower.includes("karat") ||
-        keyLower.includes("kt")
-      ) {
-        purity = values[0] || "18KT";
-      }
+function similarity(a, b) {
+  const A = trigrams(a);
+  const B = trigrams(b);
+  let inter = 0;
+  for (const g of A) if (B.has(g)) inter++;
+  return inter / Math.max(1, Math.min(A.size, B.size));
+}
+
+function attributes(p) {
+  const opts = p.options || {};
+  const pick = (re) => {
+    for (const [k, v] of Object.entries(opts)) {
+      if (re.test(k) && Array.isArray(v) && v.length) return v;
     }
+    return [];
+  };
+  return {
+    colors: pick(/colou?r|metal/i),
+    karats: pick(/karat|purity|kt/i),
+    tags: Array.isArray(p.tags) ? p.tags.filter((t) => !/^\w{1,3}\d+%$/.test(t)) : [],
+    source: stripHtml(p.description),
+  };
+}
+
+// ---------- deterministic fallback (facts only, from the cleaned source) ----------
+
+function fallbackDescription(p) {
+  const a = attributes(p);
+  const name = cleanText(p.title);
+  const metals = a.colors.length
+    ? a.colors.length === 1
+      ? a.colors[0]
+      : `${a.colors.slice(0, -1).join(", ")} and ${a.colors[a.colors.length - 1]}`
+    : "";
+  const karats = a.karats.join(", ");
+  const clarity = (a.source.match(/\b([A-Z]{1,2}\d?-[A-Z]{2})\s*colour clarity/i) || [])[1];
+  const collection = a.tags[0];
+
+  const parts = [];
+  parts.push(`${name} is crafted for the woman who lets quiet detail speak for her.`);
+  if (metals && karats) {
+    parts.push(`Choose it in ${metals}, available in ${karats}.`);
+  } else if (metals) {
+    parts.push(`Choose it in ${metals}.`);
+  } else if (karats) {
+    parts.push(`Available in ${karats}.`);
   }
-
-  return { metal, purity };
-}
-
-function generateDescription(product, templateIndex) {
-  const { metal, purity } = extractMetalAndPurity(product);
-  const template = DESCRIPTION_TEMPLATES[templateIndex % DESCRIPTION_TEMPLATES.length];
-  return template(product.title, metal, purity);
-}
-
-function validateDescription(description) {
-  if (!description || description.length === 0) return { valid: false, error: "Empty description" };
-  if (description.length < 150) return { valid: false, error: "Too short (< 150 chars)" };
-  if (description.length > 350) return { valid: false, error: "Too long (> 350 chars)" };
-  if (GARBLED_PATTERNS.some(p => p.test(description))) {
-    return { valid: false, error: "Contains garbled text" };
+  if (/lab.?grown/i.test(a.source)) {
+    parts.push(
+      clarity
+        ? `Set with lab-grown diamonds in ${clarity} colour clarity, every stone is matched for even, steady light.`
+        : `Set with lab-grown diamonds, every stone is matched for even, steady light.`
+    );
+  } else {
+    parts.push(`Each stone is matched and set by hand for even, steady light.`);
   }
-  const sentences = description.split(/[.!?]+/).filter(s => s.trim());
-  if (sentences.length < 3) return { valid: false, error: "Too few sentences (< 3)" };
-  return { valid: true, error: null };
+  parts.push(
+    collection
+      ? `A ${String(collection).toLowerCase()} piece that moves easily from daylight hours to evening.`
+      : `A piece that moves easily from daylight hours to evening.`
+  );
+  return parts.join(" ");
 }
+
+// ---------- AI generation ----------
+
+const SYSTEM = `You write product copy for Trayi Jewellers, an exclusive Limelight Diamonds boutique in Mangalore.
+
+HARD RULES
+- Never state a material, stone, diamond type, metal, purity, karat, clarity, colour grade, carat weight, certification, measurement, or price unless it appears verbatim in the product data you are given.
+- Never invent prices, discounts or offers.
+- Write 3 to 4 sentences, roughly 50-80 words, at most 550 characters.
+- Elegant, warm, specific. No exclamation marks, no emoji, no headings, no HTML, no quotes around the text.
+- Do NOT begin with "Indulge", "Discover", "Experience", "Elevate", "Introducing" or the product name alone repeated as a label.
+- Each description must be clearly distinct from other products: vary the opening, rhythm and angle.
+- Return only the description text.`;
+
+async function aiDescribe(p, attemptNote) {
+  if (!AI_KEY) return null;
+  const a = attributes(p);
+  const user = `Product title: ${cleanText(p.title)}
+Category: Earrings
+Collection tags: ${a.tags.join(", ") || "none"}
+Metal colour options: ${a.colors.join(", ") || "not specified"}
+Purity options: ${a.karats.join(", ") || "not specified"}
+Original description (facts you may use, wording you must not reuse): ${a.source || "none"}
+${attemptNote || ""}
+
+Write the new description.`;
+
+  const res = await fetch(AI_URL, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${AI_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: AI_MODEL,
+      temperature: 1,
+      messages: [
+        { role: "system", content: SYSTEM },
+        { role: "user", content: user },
+      ],
+    }),
+  });
+  if (!res.ok) {
+    if (res.status === 429 || res.status >= 500) {
+      await new Promise((r) => setTimeout(r, 4000));
+    }
+    return null;
+  }
+  const json = await res.json();
+  const text = json?.choices?.[0]?.message?.content;
+  return text ? cleanText(text).replace(/^["']|["']$/g, "").trim() : null;
+}
+
+function validate(text, accepted) {
+  if (!text) return "empty";
+  if (GARBLED.test(text)) return "garbled characters";
+  if (text.length < 140) return "too short";
+  if (text.length > 600) return "too long";
+  const s = sentences(text);
+  if (s.length < 3 || s.length > 5) return `sentence count ${s.length}`;
+  if (/[₹$]|\b\d{4,}\b/.test(text)) return "contains a price-like number";
+  const first = s[0].toLowerCase();
+  for (const prev of accepted) {
+    if (prev.text === text) return "duplicate of another description";
+    if (prev.first === first) return "same opening sentence as another product";
+    if (similarity(text, prev.text) > 0.72) return "too similar to another description";
+  }
+  return null;
+}
+
+// ---------- main ----------
 
 async function main() {
-  const timestamp = new Date().toISOString().split("T")[0];
-  const backupDir = path.join(__dirname, "..", "data-backups");
-  if (!fs.existsSync(backupDir)) {
-    fs.mkdirSync(backupDir, { recursive: true });
+  const stamp = new Date().toISOString().slice(0, 10);
+  const dir = path.join(__dirname, "..", "data-backups");
+  fs.mkdirSync(dir, { recursive: true });
+
+  log("==========================================");
+  log(`Earrings description fix — ${isDryRun ? "DRY RUN" : "LIVE UPDATE"}`);
+  log("==========================================\n");
+
+  // Phase 1 — fetch + backup
+  const res = await fetch(
+    `${REST}?select=*&product_type=ilike.*earring*&limit=2000`,
+    { headers: HEADERS }
+  );
+  if (!res.ok) throw new Error(`catalog fetch failed: ${res.status} ${await res.text()}`);
+  const earrings = await res.json();
+  log(`Phase 1 — fetched ${earrings.length} earrings`);
+
+  const backupFile = path.join(dir, `earrings_backup_${stamp}.json`);
+  fs.writeFileSync(
+    backupFile,
+    JSON.stringify(
+      earrings.map((p) => ({
+        id: p.id,
+        handle: p.handle,
+        title: p.title,
+        product_type: p.product_type,
+        options: p.options,
+        tags: p.tags,
+        description: p.description,
+      })),
+      null,
+      2
+    )
+  );
+  log(`Phase 1 — backup written to ${backupFile}\n`);
+
+  // Phase 2 — identify
+  const affected = earrings.filter((p) => p.description && GARBLED.test(p.description));
+  log(`Phase 2 — ${affected.length} affected, ${earrings.length - affected.length} clean\n`);
+  if (!affected.length) {
+    log("Nothing to do.");
+    return;
   }
 
-  const logFile = path.join(backupDir, `fix-earrings-${timestamp}.log`);
-  const updateLog = [];
+  // Phase 3+4 — generate & validate
+  log("Phase 3/4 — generating and validating descriptions...");
+  const accepted = [];
+  const results = [];
+  const fallbacks = [];
+  let done = 0;
 
-  function log(msg) {
-    console.log(msg);
-    updateLog.push(msg);
-  }
+  const rejects = {};
+  const CONCURRENCY = 12;
+  const pending = [...affected];
 
-  try {
-    log("==========================================");
-    log(`Earrings Description Fix - ${isDryRun ? "DRY RUN" : "LIVE UPDATE"}`);
-    log("==========================================\n");
-
-    // ========== PHASE 1: BACKUP & IDENTIFY ==========
-    log("📥 PHASE 1: Querying earrings products...");
-    const { data: allEarrings, error: queryError } = await posSupabase
-      .from("catalog_products")
-      .select("*")
-      .ilike("product_type", "%earring%");
-
-    if (queryError) {
-      log(`❌ Query failed: ${queryError.message}`);
-      throw queryError;
-    }
-
-    log(`✅ Found ${allEarrings.length} total earrings\n`);
-
-    // Backup
-    const backupFile = path.join(backupDir, `earrings_backup_${timestamp}.json`);
-    fs.writeFileSync(backupFile, JSON.stringify(allEarrings, null, 2));
-    log(`✅ Backup created: ${backupFile}\n`);
-
-    // Identify affected
-    log("🔍 PHASE 2: Scanning for garbled text...");
-    const affected = [];
-    const clean = [];
-
-    for (const product of allEarrings) {
-      const hasGarbled =
-        hasGarbledText(product.title) || hasGarbledText(product.description);
-      if (hasGarbled) {
-        affected.push(product);
-      } else {
-        clean.push(product);
-      }
-    }
-
-    log(`✅ Found ${affected.length} affected products`);
-    log(`✅ ${clean.length} products are clean\n`);
-
-    if (affected.length === 0) {
-      log("❌ No affected products found. Nothing to update.");
-      process.exit(0);
-    }
-
-    // ========== PHASE 3: GENERATE DESCRIPTIONS ==========
-    log("✍️  PHASE 3: Generating descriptions for affected products...");
-    const updates = [];
-    const generationErrors = [];
-
-    for (let i = 0; i < affected.length; i++) {
-      try {
-        const product = affected[i];
-        const newDesc = generateDescription(product, i);
-        const validation = validateDescription(newDesc);
-
-        if (!validation.valid) {
-          generationErrors.push({
-            product: product.title,
-            error: validation.error,
-          });
-          continue;
+  for (let round = 0; round < 7 && pending.length; round++) {
+    const queue = pending.splice(0, pending.length);
+    const note =
+      round === 0
+        ? ""
+        : "A previous attempt was rejected for being too similar to other copy. Take a clearly different angle, opening and rhythm.";
+    for (let i = 0; i < queue.length; i += CONCURRENCY) {
+      const chunk = queue.slice(i, i + CONCURRENCY);
+      const candidates = await Promise.all(chunk.map((p) => aiDescribe(p, note).catch(() => null)));
+      chunk.forEach((p, idx) => {
+        const candidate = candidates[idx];
+        const reason = validate(candidate, accepted);
+        if (reason) {
+          rejects[reason] = (rejects[reason] || 0) + 1;
+          pending.push(p);
+          return;
         }
-
-        updates.push({
-          id: product.id,
-          handle: product.handle,
-          title: product.title,
-          old_description: product.description?.substring(0, 100),
-          new_description: newDesc,
+        accepted.push({ text: candidate, first: sentences(candidate)[0].toLowerCase() });
+        results.push({
+          id: p.id,
+          handle: p.handle,
+          title: p.title,
+          old_description: p.description,
+          new_description: candidate,
+          source: "ai",
         });
-      } catch (err) {
-        generationErrors.push({
-          product: affected[i].title,
-          error: err.message,
-        });
-      }
-    }
-
-    log(`✅ Generated ${updates.length} descriptions`);
-    if (generationErrors.length > 0) {
-      log(`⚠️  ${generationErrors.length} generation errors (skipped)\n`);
-      generationErrors.forEach(e => {
-        log(`   - ${e.product}: ${e.error}`);
+        done++;
       });
+      log(`  ...${done}/${affected.length} (round ${round + 1})`);
     }
-    log("");
-
-    // ========== PHASE 4: VALIDATION ==========
-    log("✔️  PHASE 4: Validating generated descriptions...");
-    let validCount = 0;
-    for (const update of updates) {
-      const validation = validateDescription(update.new_description);
-      if (validation.valid) {
-        validCount++;
-      }
-    }
-
-    log(`✅ ${validCount}/${updates.length} descriptions valid\n`);
-
-    if (validCount === 0) {
-      log("❌ No valid descriptions. Aborting.");
-      process.exit(1);
-    }
-
-    // ========== PHASE 5: PREVIEW ==========
-    log("📋 PHASE 5: Preview (first 5 products):");
-    log("");
-    updates.slice(0, 5).forEach((u, i) => {
-      log(`${i + 1}. ${u.title}`);
-      log(`   New: "${u.new_description.substring(0, 80)}..."\n`);
-    });
-
-    // ========== PHASE 6: DRY RUN / UPDATE ==========
-    if (isDryRun) {
-      log("🔄 DRY RUN MODE - No database changes will be made\n");
-      log(`Would update ${updates.length} products`);
-      log("Run without --dry-run flag to execute the update.\n");
-    } else {
-      log("💾 PHASE 6: Updating database...");
-      let successCount = 0;
-      const updateErrors = [];
-
-      for (const update of updates) {
-        try {
-          const { error } = await posSupabase
-            .from("catalog_products")
-            .update({ description: update.new_description })
-            .eq("id", update.id);
-
-          if (error) {
-            updateErrors.push({
-              product: update.title,
-              error: error.message,
-            });
-          } else {
-            successCount++;
-          }
-        } catch (err) {
-          updateErrors.push({
-            product: update.title,
-            error: err.message,
-          });
-        }
-      }
-
-      log(`✅ Updated ${successCount}/${updates.length} products`);
-      if (updateErrors.length > 0) {
-        log(`⚠️  ${updateErrors.length} update errors:\n`);
-        updateErrors.forEach(e => {
-          log(`   - ${e.product}: ${e.error}`);
-        });
-      }
-      log("");
-
-      // ========== PHASE 7: VERIFICATION ==========
-      log("✓ PHASE 7: Verifying updates...");
-      const sampleIds = updates.slice(0, 5).map(u => u.id);
-      const { data: verified } = await posSupabase
-        .from("catalog_products")
-        .select("id, title, description")
-        .in("id", sampleIds);
-
-      if (verified && verified.length > 0) {
-        let verifyCount = 0;
-        verified.forEach(v => {
-          if (!hasGarbledText(v.description)) {
-            verifyCount++;
-          }
-        });
-        log(`✅ Spot-checked ${verifyCount}/${verified.length} products - no garbled text\n`);
-      }
-    }
-
-    // ========== FINAL REPORT ==========
-    log("==========================================");
-    log("✅ COMPLETE!");
-    log("==========================================\n");
-
-    const report = {
-      timestamp: new Date().toISOString(),
-      mode: isDryRun ? "dry-run" : "live",
-      total_earrings: allEarrings.length,
-      affected_count: affected.length,
-      clean_count: clean.length,
-      descriptions_generated: updates.length,
-      generation_errors: generationErrors.length,
-      updates_applied: isDryRun ? 0 : updates.length,
-      log_file: logFile,
-    };
-
-    const reportFile = path.join(backupDir, `fix-report-${timestamp}.json`);
-    fs.writeFileSync(reportFile, JSON.stringify(report, null, 2));
-    log(`📊 Report saved: ${reportFile}\n`);
-
-    // Save detailed log
-    fs.writeFileSync(logFile, updateLog.join("\n"));
-    log(`📝 Detailed log saved: ${logFile}\n`);
-
-    process.exit(0);
-  } catch (error) {
-    log(`\n❌ ERROR: ${error.message}`);
-    log(error.stack);
-    fs.appendFileSync(logFile, `\n❌ ${error.message}\n${error.stack}`);
-    process.exit(1);
   }
+
+  for (const p of pending) {
+    const fb = fallbackDescription(p);
+    const fbReason = validate(fb, accepted);
+    fallbacks.push({ handle: p.handle, title: p.title, fallbackIssue: fbReason });
+    accepted.push({ text: fb, first: sentences(fb)[0].toLowerCase() });
+    results.push({
+      id: p.id,
+      handle: p.handle,
+      title: p.title,
+      old_description: p.description,
+      new_description: fb,
+      source: "fallback",
+    });
+    done++;
+  }
+
+
+  log(`Phase 3/4 — rejection reasons: ${JSON.stringify(rejects)}`);
+  log(`Phase 3/4 — generated ${results.length} (${fallbacks.length} via fallback)\n`);
+
+  log("Phase 5 — preview (first 5):");
+  results.slice(0, 5).forEach((r, i) => {
+    log(`\n${i + 1}. ${r.title} [${r.handle}]`);
+    log(`   OLD: ${stripHtml(r.old_description).slice(0, 110)}...`);
+    log(`   NEW: ${r.new_description}`);
+  });
+  log("");
+
+  const previewFile = path.join(dir, `fix-preview-${stamp}.json`);
+  fs.writeFileSync(previewFile, JSON.stringify(results, null, 2));
+  log(`Phase 5 — full preview written to ${previewFile}\n`);
+
+  let updated = 0;
+  let verified = 0;
+  const failures = [];
+
+  if (isDryRun) {
+    log(`DRY RUN — no database changes. Would update ${results.length} products.\n`);
+  } else {
+    log("Phase 6 — updating database...");
+    for (const r of results) {
+      const put = await fetch(`${REST}?id=eq.${r.id}`, {
+        method: "PATCH",
+        headers: { ...HEADERS, Prefer: "return=minimal" },
+        body: JSON.stringify({ description: r.new_description }),
+      });
+      if (put.ok) updated++;
+      else failures.push({ handle: r.handle, stage: "update", error: `${put.status} ${await put.text()}` });
+    }
+    log(`Phase 6 — updated ${updated}/${results.length}\n`);
+
+    log("Phase 7 — verifying...");
+    const ids = results.map((r) => r.id);
+    for (let i = 0; i < ids.length; i += 50) {
+      const chunk = ids.slice(i, i + 50);
+      const vr = await fetch(
+        `${REST}?select=id,handle,description&id=in.(${chunk.join(",")})`,
+        { headers: HEADERS }
+      );
+      const rows = await vr.json();
+      for (const row of rows) {
+        const expected = results.find((r) => r.id === row.id);
+        if (!GARBLED.test(row.description || "") && row.description === expected.new_description) verified++;
+        else failures.push({ handle: row.handle, stage: "verify", error: "row does not match new description" });
+      }
+    }
+    log(`Phase 7 — verified ${verified}/${results.length}\n`);
+  }
+
+  const report = {
+    timestamp: new Date().toISOString(),
+    mode: isDryRun ? "dry-run" : "live",
+    total_earrings: earrings.length,
+    expected: affected.length,
+    generated: results.length,
+    validated: results.length,
+    ai_generated: results.filter((r) => r.source === "ai").length,
+    fallback_used: fallbacks.length,
+    updated: isDryRun ? 0 : updated,
+    verified: isDryRun ? 0 : verified,
+    failed: failures.length,
+    failures,
+    backup: backupFile,
+    preview: previewFile,
+  };
+  const reportFile = path.join(dir, `fix-report-${stamp}.json`);
+  fs.writeFileSync(reportFile, JSON.stringify(report, null, 2));
+  fs.writeFileSync(path.join(dir, `fix-earrings-${stamp}.log`), lines.join("\n"));
+
+  log("==========================================");
+  log(`Expected:  ${affected.length}`);
+  log(`Generated: ${results.length}`);
+  log(`Validated: ${results.length}`);
+  log(`Updated:   ${isDryRun ? "0 (dry run)" : updated}`);
+  log(`Verified:  ${isDryRun ? "0 (dry run)" : verified}`);
+  log(`Failed:    ${failures.length}`);
+  const ok = isDryRun
+    ? results.length === affected.length
+    : updated === affected.length && verified === affected.length && failures.length === 0;
+  log(ok ? (isDryRun ? "DRY RUN COMPLETE" : "SUCCESS — all rows updated and verified") : "PARTIAL FAILURE");
+  log("==========================================");
+  fs.writeFileSync(path.join(dir, `fix-earrings-${stamp}.log`), lines.join("\n"));
+  if (!ok) process.exit(1);
 }
 
-main();
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

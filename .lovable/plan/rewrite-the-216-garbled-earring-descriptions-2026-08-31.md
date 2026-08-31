@@ -34,4 +34,63 @@ Descriptions are produced by the built-in AI (Lovable AI Gateway) in small batch
 - Script: `scripts/fix-earrings-garbled-text.js`, rewritten to use per-product AI generation plus the deterministic fallback, run with `--dry-run` first, then live.
 - Reads/writes `catalog_products` in the POS backend through its REST endpoint using the existing publishable key already stored in `src/lib/pos-supabase.ts`.
 - Artefacts written to `data-backups/`: `earrings_backup_<date>.json`, `fix-earrings-<date>.log`, `fix-report-<date>.json`.
-- Updates run row-by-row with per-row error capture; a failed row is reported, never silently skipped.
+- Updates run row-by-row with per-row error capture; a failed row is reported, never silently skipped.  
+  
+Validation:  
+4 things I would change
+  **1. Don't rely on "duplicate description" as the only uniqueness test.**
+  Two descriptions can be technically different but still almost identical. Add a similarity check, not just exact duplicate detection.
+  For example:
+  - exact duplicate → reject
+  - extremely similar opening/structure → regenerate
+  - same first sentence across many products → reject
+  The requirement should be **meaningfully differentiated copy**, not merely different strings.
+  ---
+  **2. The 150–450 character limit conflicts somewhat with 60–90 words.**
+  60–90 English words can easily exceed 450 characters.
+  I'd use something like:
+  > **3–4 sentences, approximately 50–80 words, maximum ~600 characters**
+  Or, if 150–450 characters is important for the UI/SEO, remove the 60–90-word requirement.
+  I'd prioritize **natural, useful descriptions over hitting an arbitrary character count**.
+  ---
+  **3. Be very careful with "mention lab-grown diamonds."**
+  This is the biggest content concern.
+  The plan says every description should mention lab-grown diamonds. That's fine **only if every affected earring is actually a lab-grown diamond product**.
+  If the catalog's product data confirms that, great.
+  If not, don't force the claim.
+  The generator should have a hard rule:
+  > **Never claim a material, diamond type, metal, purity, clarity, colour, stone, certification, or feature unless that attribute is explicitly present in the source product data.**
+  This is more important than making all descriptions stylistically consistent.
+  ---
+  **4. Don't store the backup only inside the project and then commit it.**
+  A backup in `data-backups/` is good, but make sure it isn't accidentally committed to the repository if it contains proprietary catalog data.
+  I'd add:
+  > Add `data-backups/` to `.gitignore` unless the project explicitly requires these snapshots to be version-controlled.
+  Also, ideally the backup should contain the **exact row ID + original description + relevant fields**, so rollback is straightforward.
+  ---
+  # One thing I especially like
+  This part is excellent:
+  > "a failed row is reported, never silently skipped."
+  I'd strengthen it further:
+  **The script should refuse to declare success unless all 216 rows have been successfully updated and verified.**
+  For example:
+  ```
+
+  ```
+  ```
+  Expected: 216
+  Generated: 216
+  Validated: 216
+  Updated: 216
+  Verified: 216
+  Failed: 0
+  ```
+  If it ends up:
+  ```
+
+  ```
+  ```
+  Updated: 214
+  Failed: 2
+  ```
+  the process should clearly report **PARTIAL FAILURE**, not "completed successfully."
