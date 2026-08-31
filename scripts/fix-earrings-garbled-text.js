@@ -249,37 +249,56 @@ async function main() {
   const fallbacks = [];
   let done = 0;
 
-  for (const p of affected) {
-    let text = null;
-    let reason = null;
-    for (let attempt = 0; attempt < 3 && !text; attempt++) {
-      const candidate = await aiDescribe(
-        p,
-        reason ? `Previous attempt was rejected (${reason}). Write something clearly different.` : ""
-      );
-      reason = validate(candidate, accepted);
-      if (!reason) text = candidate;
+  const CONCURRENCY = 12;
+  const pending = [...affected];
+
+  for (let round = 0; round < 4 && pending.length; round++) {
+    const queue = pending.splice(0, pending.length);
+    const note =
+      round === 0
+        ? ""
+        : "A previous attempt was rejected for being too similar to other copy. Take a clearly different angle, opening and rhythm.";
+    for (let i = 0; i < queue.length; i += CONCURRENCY) {
+      const chunk = queue.slice(i, i + CONCURRENCY);
+      const candidates = await Promise.all(chunk.map((p) => aiDescribe(p, note).catch(() => null)));
+      chunk.forEach((p, idx) => {
+        const candidate = candidates[idx];
+        const reason = validate(candidate, accepted);
+        if (reason) {
+          pending.push(p);
+          return;
+        }
+        accepted.push({ text: candidate, first: sentences(candidate)[0].toLowerCase() });
+        results.push({
+          id: p.id,
+          handle: p.handle,
+          title: p.title,
+          old_description: p.description,
+          new_description: candidate,
+          source: "ai",
+        });
+        done++;
+      });
+      log(`  ...${done}/${affected.length} (round ${round + 1})`);
     }
-    let usedFallback = false;
-    if (!text) {
-      const fb = fallbackDescription(p);
-      const fbReason = validate(fb, accepted);
-      text = fbReason ? `${fb}` : fb;
-      usedFallback = true;
-      fallbacks.push({ handle: p.handle, title: p.title, lastReason: reason, fallbackIssue: fbReason });
-    }
-    accepted.push({ text, first: sentences(text)[0].toLowerCase() });
+  }
+
+  for (const p of pending) {
+    const fb = fallbackDescription(p);
+    const fbReason = validate(fb, accepted);
+    fallbacks.push({ handle: p.handle, title: p.title, fallbackIssue: fbReason });
+    accepted.push({ text: fb, first: sentences(fb)[0].toLowerCase() });
     results.push({
       id: p.id,
       handle: p.handle,
       title: p.title,
       old_description: p.description,
-      new_description: text,
-      source: usedFallback ? "fallback" : "ai",
+      new_description: fb,
+      source: "fallback",
     });
     done++;
-    if (done % 20 === 0) log(`  ...${done}/${affected.length}`);
   }
+
 
   log(`Phase 3/4 — generated ${results.length} (${fallbacks.length} via fallback)\n`);
 
