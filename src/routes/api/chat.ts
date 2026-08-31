@@ -251,4 +251,13 @@ async function handleChat({ request }: { request: Request }): Promise<Response> 
       { status: 500 }
     );
   }
-};
+}
+
+export const Route = createFileRoute('/api/chat')({
+  server: {
+    handlers: {
+      POST: handleChat,
+    },
+  },
+});
+
