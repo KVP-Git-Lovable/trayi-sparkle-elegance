@@ -181,7 +181,7 @@ Write the new description.`;
 function validate(text, accepted) {
   if (!text) return "empty";
   if (GARBLED.test(text)) return "garbled characters";
-  if (text.length < 150) return "too short";
+  if (text.length < 140) return "too short";
   if (text.length > 600) return "too long";
   const s = sentences(text);
   if (s.length < 3 || s.length > 5) return `sentence count ${s.length}`;
@@ -190,7 +190,7 @@ function validate(text, accepted) {
   for (const prev of accepted) {
     if (prev.text === text) return "duplicate of another description";
     if (prev.first === first) return "same opening sentence as another product";
-    if (similarity(text, prev.text) > 0.55) return "too similar to another description";
+    if (similarity(text, prev.text) > 0.72) return "too similar to another description";
   }
   return null;
 }
@@ -249,10 +249,11 @@ async function main() {
   const fallbacks = [];
   let done = 0;
 
+  const rejects = {};
   const CONCURRENCY = 12;
   const pending = [...affected];
 
-  for (let round = 0; round < 4 && pending.length; round++) {
+  for (let round = 0; round < 7 && pending.length; round++) {
     const queue = pending.splice(0, pending.length);
     const note =
       round === 0
@@ -265,6 +266,7 @@ async function main() {
         const candidate = candidates[idx];
         const reason = validate(candidate, accepted);
         if (reason) {
+          rejects[reason] = (rejects[reason] || 0) + 1;
           pending.push(p);
           return;
         }
@@ -300,6 +302,7 @@ async function main() {
   }
 
 
+  log(`Phase 3/4 — rejection reasons: ${JSON.stringify(rejects)}`);
   log(`Phase 3/4 — generated ${results.length} (${fallbacks.length} via fallback)\n`);
 
   log("Phase 5 — preview (first 5):");
