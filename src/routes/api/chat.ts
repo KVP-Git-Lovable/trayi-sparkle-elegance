@@ -105,30 +105,36 @@ function boundHistory(messages: ChatMessage[]): ChatMessage[] {
   return result;
 }
 
-// Call Together AI API
-async function callTogetherAI(
+type ResponsesOutput = {
+  output_text?: string;
+  output?: Array<{ content?: Array<{ type?: string; text?: string }> }>;
+};
+
+// Call Lovable AI Gateway (Responses API)
+async function callAiGateway(
+  apiKey: string,
   messages: ChatMessage[],
   systemPrompt: string
 ): Promise<string> {
   const payload = {
-    model: TOGETHER_MODEL,
-    messages: [
-      { role: 'system', content: systemPrompt },
-      ...messages,
-    ],
-    max_tokens: 512,
-    temperature: 0.7,
-    top_p: 0.9,
+    model: AI_MODEL,
+    instructions: systemPrompt,
+    input: messages.map((m) => ({
+      role: m.role,
+      content: [
+        { type: m.role === 'user' ? 'input_text' : 'output_text', text: m.content },
+      ],
+    })),
   };
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    const response = await fetch(TOGETHER_API_URL, {
+    const response = await fetch(AI_GATEWAY_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${TOGETHER_AI_KEY}`,
+        'Lovable-API-Key': apiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
@@ -136,12 +142,22 @@ async function callTogetherAI(
     });
 
     if (!response.ok) {
-      console.error(`Together AI error: ${response.status}`);
+      const detail = await response.text().catch(() => '');
+      console.error(`AI gateway error ${response.status}: ${detail}`);
+      if (response.status === 429) throw new Error('Too many requests. Please try again in a moment.');
+      if (response.status === 402) throw new Error('AI credits are exhausted. Please contact the store.');
       throw new Error('AI service error');
     }
 
-    const data = await response.json() as any;
-    const text = data?.output?.choices?.[0]?.text || '';
+    const data = (await response.json()) as ResponsesOutput;
+    const text =
+      data.output_text ||
+      (data.output ?? [])
+        .flatMap((item) => item.content ?? [])
+        .filter((c) => c.type === 'output_text' || typeof c.text === 'string')
+        .map((c) => c.text ?? '')
+        .join('')
+        .trim();
 
     if (!text) {
       throw new Error('Empty response from AI');
@@ -150,11 +166,11 @@ async function callTogetherAI(
     return cleanText(text).trim();
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
-      console.error('Together AI request timeout');
+      console.error('AI gateway request timeout');
       throw new Error('Request timeout');
     }
-    console.error('Together AI error:', error);
-    throw new Error('AI service unavailable');
+    console.error('AI gateway error:', error);
+    throw error instanceof Error ? error : new Error('AI service unavailable');
   } finally {
     clearTimeout(timeout);
   }
