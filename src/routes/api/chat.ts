@@ -8,10 +8,16 @@
  * - Returns safe, sanitized responses
  */
 
-import { json, type RequestHandler } from '@tanstack/start';
-import { posSupabase } from '~/lib/pos-supabase';
-import { buildTrustedContext } from '~/lib/chat-context';
-import { cleanText } from '~/lib/text-clean';
+import { createFileRoute } from '@tanstack/react-router';
+import { buildTrustedContext } from '@/lib/chat-context';
+import { cleanText } from '@/lib/text-clean';
+
+const json = (data: unknown, init?: ResponseInit) =>
+  new Response(JSON.stringify(data), {
+    ...init,
+    headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
+  });
+
 
 // Environment variables (server-side only)
 const TOGETHER_AI_KEY = process.env.TOGETHER_AI_KEY;
