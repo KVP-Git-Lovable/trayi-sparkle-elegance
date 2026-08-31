@@ -208,7 +208,7 @@ function mapRow(row: CatalogRow): Product {
     image,
     gallery: image ? [image] : [],
     description:
-      EARRING_DESCRIPTIONS[row.handle] ||
+      (row.handle ? EARRING_DESCRIPTIONS[row.handle] : undefined) ||
       cleanText(stripHtml(row.description)) ||
       cleanText(row.title),
 
