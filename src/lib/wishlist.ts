@@ -44,20 +44,19 @@ export function useWishlist() {
       // Optimistic: Remove from local state immediately
       setItems(prev => prev.filter(i => i.product_handle !== product.id));
 
-      // Background: Delete from database and refresh if needed
-      supabase
-        .from("wishlist_items")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("product_handle", product.id)
-        .then(() => {
-          // Optional: refresh to ensure sync, or skip if confident in optimistic update
-        })
-        .catch(error => {
+      // Background: Delete from database
+      void (async () => {
+        const { error } = await supabase
+          .from("wishlist_items")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("product_handle", product.id);
+        if (error) {
           console.error("Failed to remove from wishlist:", error);
-          // Revert on error by refreshing
           void refresh();
-        });
+        }
+      })();
+
 
       return "removed" as const;
     }
@@ -73,24 +72,20 @@ export function useWishlist() {
     };
     setItems(prev => [newItem, ...prev]);
 
-    // Background: Insert into database and refresh if needed
-    supabase
-      .from("wishlist_items")
-      .insert({
+    // Background: Insert into database
+    void (async () => {
+      const { error } = await supabase.from("wishlist_items").insert({
         user_id: user.id,
         product_handle: product.id,
         product_title: product.name,
         product_image: product.image,
         product_price: price ?? product.price,
-      })
-      .then(() => {
-        // Optional: refresh to get real ID and ensure sync, or skip if confident
-      })
-      .catch(error => {
-        console.error("Failed to add to wishlist:", error);
-        // Revert on error by refreshing
-        void refresh();
       });
+      if (error) {
+        console.error("Failed to add to wishlist:", error);
+        void refresh();
+      }
+    })();
 
     return "added" as const;
   };
@@ -102,16 +97,16 @@ export function useWishlist() {
     setItems(prev => prev.filter(i => i.product_handle !== handle));
 
     // Background: Delete from database
-    supabase
+    const { error } = await supabase
       .from("wishlist_items")
       .delete()
       .eq("user_id", user.id)
-      .eq("product_handle", handle)
-      .catch(error => {
-        console.error("Failed to remove from wishlist:", error);
-        // Revert on error by refreshing
-        void refresh();
-      });
+      .eq("product_handle", handle);
+    if (error) {
+      console.error("Failed to remove from wishlist:", error);
+      void refresh();
+    }
+
   };
 
   return { items, loading, has, toggle, remove, refresh };

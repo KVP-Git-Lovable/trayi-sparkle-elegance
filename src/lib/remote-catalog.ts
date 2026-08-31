@@ -2,6 +2,12 @@ import { posSupabase } from "./pos-supabase";
 import type { Product } from "./catalog";
 import { evaluateApplicableSchemes, type Scheme } from "./pos-schemes";
 import { cleanText } from "./text-clean";
+import earringDescriptions from "@/data/earring-descriptions.json";
+
+// Rewritten copy for earrings whose stored description is unrecoverably garbled.
+// Keyed by product handle; display-only, the POS data is untouched.
+const EARRING_DESCRIPTIONS = earringDescriptions as Record<string, string>;
+
 
 type CatalogRow = {
   id: string;
@@ -201,7 +207,11 @@ function mapRow(row: CatalogRow): Product {
     sizeLabel: sizes ? SIZE_LABEL[slug] ?? "Size" : undefined,
     image,
     gallery: image ? [image] : [],
-    description: cleanText(stripHtml(row.description)) || cleanText(row.title),
+    description:
+      (row.handle ? EARRING_DESCRIPTIONS[row.handle] : undefined) ||
+      cleanText(stripHtml(row.description)) ||
+      cleanText(row.title),
+
     sku,
     weightGm: 0,
     diamondCt: 0,
