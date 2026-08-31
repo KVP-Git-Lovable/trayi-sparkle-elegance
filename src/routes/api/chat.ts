@@ -180,9 +180,10 @@ async function callAiGateway(
 async function handleChat({ request }: { request: Request }): Promise<Response> {
 
   try {
-    // Check prerequisites
-    if (!TOGETHER_AI_KEY) {
-      console.error('TOGETHER_AI_KEY not configured');
+    // Check prerequisites (read env inside the handler)
+    const apiKey = process.env['LOVABLE_API_KEY'];
+    if (!apiKey) {
+      console.error('LOVABLE_API_KEY not configured');
       return json(
         { error: 'Service not configured' },
         { status: 503 }
