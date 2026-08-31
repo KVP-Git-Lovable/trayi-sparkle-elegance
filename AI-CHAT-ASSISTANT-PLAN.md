@@ -20,15 +20,129 @@ This feature improves user experience by providing instant help without requirin
 
 ## Implementation Architecture
 
+### Critical Security Requirements (MUST IMPLEMENT)
+
+⚠️ **1. Server-Side API Key Only**
+- ❌ DO NOT use `VITE_TOGETHER_AI_KEY` (client-side exposure)
+- ✅ DO store Together AI API key as server-side secret only
+- ✅ Browser NEVER receives API credential
+- Architecture: Browser → `/api/chat` endpoint → Server → Together AI
+
+⚠️ **2. Grounded in Trusted Catalog Data**
+- ❌ DO NOT rely on generic system prompt alone
+- ✅ DO retrieve actual product data from catalog before calling Together AI
+- ✅ Search catalog for relevant products (don't send all 750 on every request)
+- ✅ Include verified website info: policies, shipping, payment, collections
+- ✅ Strict instruction: Never invent prices, availability, specs, certifications
+- For missing info: Clearly state unavailability, direct to contact channel
+
+⚠️ **3. Server-Side Protection & Validation**
+- Rate limiting per IP/session
+- Maximum message length validation
+- Bounded conversation history (not unlimited)
+- Maximum output tokens
+- Request timeouts
+- Input/output validation and sanitization
+- Safe error handling (no API keys, stack traces, or internal details to browser)
+- Concurrent request protection
+
 ### Overview
 1. Create `ChatProvider` context (pattern: similar to `CartProvider`, `AuthProvider`)
 2. Create `ChatWidget` component (persistent floating button + modal chat)
-3. Create `ChatAPI` utility for Together.AI integration
-4. Mount in root layout in `RootComponent`
+3. Create **Server-side `/api/chat` endpoint** for Together.AI integration (NEW - CRITICAL)
+4. Create server-side catalog/context retrieval utility (NEW - CRITICAL)
+5. Mount in root layout in `RootComponent`
 
 ### Key Files to Create
 
-#### 1. Chat Context & State Management
+#### 1. Server-Side Chat Endpoint (CRITICAL)
+**File**: `src/routes/api/chat.ts` (or backend equivalent)
+
+Purpose: Handle chat requests securely with Together AI, grounded in catalog data
+
+Implementation:
+```typescript
+// POST /api/chat
+interface ChatRequest {
+  messages: Array<{role: "user" | "assistant", content: string}>;
+  context?: {searchTerm?: string, productId?: string};
+}
+
+export async function POST(request: Request) {
+  // 1. Validate & rate limit (per IP/session)
+  // 2. Enforce max message length, max history size
+  // 3. If user asks about product, search catalog for relevant data
+  // 4. Build trusted context from catalog/website info
+  // 5. Call Together AI with system prompt + context + conversation
+  // 6. Validate response, sanitize output
+  // 7. Return safe response to browser (no API keys/errors)
+}
+```
+
+**Responsibilities**:
+- Rate limiting by IP/session ID
+- Message length validation
+- Conversation history bounds (last N messages, not unlimited)
+- Catalog context retrieval (product search, policy retrieval)
+- Together AI API call (server-side only - key never leaves server)
+- Response validation & sanitization
+- Error handling (safe user-facing messages)
+
+#### 2. Server-Side Catalog Context Retrieval (CRITICAL)
+**File**: `src/lib/chat-context.ts` (server utility)
+
+Purpose: Retrieve grounded facts from catalog and website
+
+Provides:
+```typescript
+interface TrustedContext {
+  productFacts?: {
+    name: string;
+    description: string;
+    price: number;
+    metal: string;
+    purity: string;
+    attributes: Record<string, string>;
+    url: string;
+  }[];
+  collectionInfo?: string[];
+  shippingInfo?: string;
+  returnPolicy?: string;
+  paymentInfo?: string;
+}
+
+export async function buildTrustedContext(
+  searchTerm?: string,
+  productId?: string
+): Promise<TrustedContext>
+```
+
+**System Instruction with Context**:
+```
+You are a helpful AI assistant for Trayi Jewellery, an exclusive Limelight Diamonds boutique.
+
+IMPORTANT: You have access to verified product catalog and website information below.
+ONLY state facts that appear in this context. NEVER invent:
+- Prices, discounts, promotions
+- Product availability or stock
+- Delivery dates or timelines
+- Diamond grades, certifications, specifications
+- Metal types or purities (unless stated)
+- Return/refund terms (unless stated)
+- Warranty or guarantee claims
+
+If information is unavailable in the catalog, explicitly say so and direct the user to contact support or visit the website.
+
+Verified Context:
+[Catalog data inserted here]
+[Policies inserted here]
+
+User Question: [user message]
+
+Answer only using the verified context above.
+```
+
+#### 3. Chat Context & State Management
 **File**: `src/lib/chat.tsx`
 
 Purpose: Manage global chat state (messages, loading, open/closed)
@@ -56,28 +170,33 @@ interface ChatContextType {
 // useChatContext() hook
 ```
 
-#### 2. Together.AI Integration
+#### 4. Client-Side Chat API Wrapper
 **File**: `src/lib/chat-api.ts`
 
-Purpose: Handle API communication with Together.AI
+Purpose: Communicate with server-side `/api/chat` endpoint (no Together AI key exposed)
 
 Implementation:
-- Accept Together.AI API key as environment variable: `VITE_TOGETHER_AI_KEY`
-- Fetch function to send message and get response
-- Error handling and retry logic
-- System prompt to keep assistant focused on website/product questions
-
 ```typescript
-const TOGETHER_API_URL = "https://api.together.xyz/inference";
-const SYSTEM_PROMPT = "You are a helpful AI assistant for Trayi Jewellery...";
+interface ChatRequest {
+  messages: Array<{role: "user" | "assistant", content: string}>;
+  context?: {searchTerm?: string};
+}
 
-export async function getChatResponse(messages: ChatMessage[]): Promise<string> {
-  // Format messages for Together.AI
-  // Call API
-  // Return response text
-  // Handle errors with toast notification
+interface ChatResponse {
+  message: string;
+  error?: string;
+}
+
+export async function sendChatMessage(req: ChatRequest): Promise<ChatResponse> {
+  // 1. Validate message length client-side
+  // 2. POST to /api/chat (server handles Together AI)
+  // 3. Handle response or errors
+  // 4. Return response text
+  // Note: Together.AI key NEVER visible to browser
 }
 ```
+
+**Key Difference**: This wrapper sends to YOUR server endpoint, not directly to Together AI. Server handles all API credentials and catalog retrieval.
 
 #### 3. Chat Widget Component
 **File**: `src/components/chat-widget.tsx`
@@ -138,18 +257,24 @@ After:
 
 ### Environment Configuration
 
-**File**: `.env` (or `.env.local`)
+⚠️ **CRITICAL: API Key Server-Side Only**
+
+**File**: `.env.local` (Server environment - NOT visible to browser)
 
 Add:
 ```
-VITE_TOGETHER_AI_KEY=tgp_v1_bZPrgdYW7ZkNQ-LRBc0Lr9K0BYBv3B7uJxgIIbIU6R0
+# Server-side only - NEVER expose to browser
+TOGETHER_AI_KEY=<new-api-key-from-together-ai>
+TOGETHER_AI_ENDPOINT=https://api.together.xyz/inference
+TOGETHER_AI_MODEL=meta-llama/Meta-Llama-3-8B-Instruct-Turbo
 ```
 
-**File**: `src/config/env.ts` (if exists, or create)
-
-```typescript
-export const TOGETHER_AI_KEY = import.meta.env.VITE_TOGETHER_AI_KEY;
-```
+**⚠️ IMPORTANT**: 
+- The API key `tgp_v1_bZPrgdYW7ZkNQ-LRBc0Lr9K0BYBv3B7uJxgIIbIU6R0` should be **revoked/rotated** as it was mentioned in plaintext
+- Get a new API key from Together AI
+- Store only in server environment (`.env.local` for local dev, server secrets in production)
+- NEVER use `VITE_` prefix (that exposes to browser)
+- NEVER reference in client-side code
 
 ## Technical Details
 
@@ -243,11 +368,16 @@ Response format:
 
 | File | Type | Purpose |
 |------|------|---------|
+| **Server-Side (CRITICAL)** | | |
+| `src/routes/api/chat.ts` | **NEW** | Secure chat endpoint, Together.AI call, rate limiting |
+| `src/lib/chat-context.ts` | **NEW** | Catalog context retrieval, fact grounding |
+| **Client-Side** | | |
 | `src/lib/chat.tsx` | **NEW** | Chat context, state, provider |
-| `src/lib/chat-api.ts` | **NEW** | Together.AI API integration |
+| `src/lib/chat-api.ts` | **NEW** | API wrapper (calls `/api/chat` server endpoint) |
 | `src/components/chat-widget.tsx` | **NEW** | Chat UI (button + modal) |
+| **Config & Layout** | | |
 | `src/routes/__root.tsx` | **MODIFY** | Add ChatProvider + ChatWidget |
-| `.env` | **UPDATE** | Add Together.AI API key |
+| `.env.local` | **UPDATE** | Add server-side secrets (NOT client-side) |
 
 ## Implementation Checklist
 
@@ -274,6 +404,59 @@ Response format:
 - [ ] Test Together.AI API responses
 - [ ] Test error handling
 - [ ] Verify no interference with existing features
+
+## Server-Side Protection Implementation
+
+### Rate Limiting & Validation
+```typescript
+// In /api/chat endpoint
+- Identify client: IP address or session ID
+- Rate limit: Max N requests per minute per IP
+- Message length: Max 500 chars per message
+- History size: Keep last 10 messages only (bounded context)
+- Conversation size: Max 2000 tokens total in history
+- Request timeout: 30-second max for Together AI response
+```
+
+### Safe Error Handling
+```typescript
+// Errors returned to browser should be generic
+Safe responses:
+- "I'm having trouble processing your request. Please try again."
+- "That question is outside my knowledge. Please contact support."
+
+NEVER expose to browser:
+- API key values
+- Stack traces
+- Database errors
+- Together AI provider details
+- Internal server structure
+```
+
+### Catalog Context Bounds
+```typescript
+// Don't send entire 750-product catalog on every request
+// For product searches:
+if (searchTerm) {
+  relevantProducts = searchCatalog(searchTerm); // Max 3-5 results
+} else {
+  // Generic context only (policies, shipping, collections)
+}
+
+// System prompt includes only retrieved context, not full catalog
+```
+
+### Validation Checklist Before Launch
+- [ ] No `VITE_TOGETHER_AI_KEY` in codebase
+- [ ] Together.AI key stored server-side only (`.env.local`, not `.env`)
+- [ ] Browser network requests don't include API key
+- [ ] `/api/chat` endpoint implements rate limiting
+- [ ] Input validation: message length, history size bounds
+- [ ] Response sanitization: no API keys or stack traces to browser
+- [ ] Catalog context retrieval working: products/policies/shipping
+- [ ] System prompt includes strict "don't invent" instructions
+- [ ] Error messages are generic (no internal details)
+- [ ] Tests verify secure error handling
 
 ## Testing & Verification
 
@@ -330,7 +513,46 @@ Response format:
 - Multiple AI models selection
 
 ### Security Considerations
-- API key in environment variables (never hardcoded)
+- ⚠️ **API key in server environment variables only** (never client-side, never hardcoded)
 - No sensitive data in prompts (no password hints, etc.)
-- Rate limiting on API calls (server-side when backend available)
+- Rate limiting on API calls (mandatory server-side)
 - Content filtering for inappropriate requests
+- No internal errors or stack traces to browser
+- Bounded conversation history (not unlimited)
+- Input validation on message length and frequency
+
+## Acceptance Criteria (MUST PASS BEFORE LAUNCH)
+
+### 1. Security: API Credential Protection ✓
+- [ ] No `VITE_TOGETHER_AI_KEY` exists in codebase
+- [ ] Together.AI API key stored only in server-side secrets (`.env.local`, production secrets manager)
+- [ ] Browser code NEVER references the API key
+- [ ] Network inspection shows no API key in requests from browser
+- [ ] `/api/chat` endpoint handles all Together.AI communication server-side
+- [ ] Old API key `tgp_v1_bZPrgdYW7ZkNQ-LRBc0Lr9K0BYBv3B7uJxgIIbIU6R0` is revoked/rotated
+
+### 2. Grounding: Trusted Catalog Facts ✓
+- [ ] Assistant answers product questions using actual catalog data (not invented)
+- [ ] Catalog context retrieval implemented: `src/lib/chat-context.ts`
+- [ ] System prompt includes strict "don't invent" instructions
+- [ ] For missing info, assistant explicitly says "I don't have that information" and directs to contact/website
+- [ ] Assistant never invents: prices, discounts, availability, specs, certifications, return terms, delivery dates, warranty
+- [ ] Test cases verify fact-grounding (positive: catalog fact returns correctly, negative: missing fact returns "unavailable")
+
+### 3. Protection: Server-Side Defense ✓
+- [ ] `/api/chat` endpoint has rate limiting per IP/session
+- [ ] Message length validation (max 500 chars)
+- [ ] Conversation history bounded (max 10 messages, max 2000 tokens)
+- [ ] Request timeout (max 30s)
+- [ ] Concurrent request protection
+- [ ] Input sanitization and output validation
+- [ ] Error handling returns generic messages (no API keys, stack traces, internal details)
+- [ ] Together.AI errors are caught and converted to safe user-facing messages
+
+### Scope: No Changes to Existing
+- Keep ChatProvider and ChatWidget UI unchanged
+- Keep floating launcher position and behavior
+- Keep in-memory conversation (no persistence yet)
+- Keep anonymous and authenticated access patterns
+- Keep clear-history functionality
+- Don't modify other storefront features
