@@ -15,6 +15,8 @@ import { CartProvider } from "@/lib/cart";
 import { AuthProvider } from "@/lib/auth";
 import { PriceVisibilityProvider } from "@/lib/price-visibility";
 import { FilterVisibilityProvider } from "@/lib/filter-visibility";
+import { ChatProvider } from "@/lib/chat";
+import { ChatWidget } from "@/components/chat-widget";
 import { Toaster } from "sonner";
 
 function NotFoundComponent() {
@@ -132,9 +134,12 @@ function RootComponent() {
         <CartProvider>
           <PriceVisibilityProvider>
             <FilterVisibilityProvider>
-              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-              <Outlet />
-              <Toaster position="bottom-right" theme="light" />
+              <ChatProvider>
+                {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+                <Outlet />
+                <Toaster position="bottom-right" theme="light" />
+                <ChatWidget />
+              </ChatProvider>
             </FilterVisibilityProvider>
           </PriceVisibilityProvider>
         </CartProvider>
