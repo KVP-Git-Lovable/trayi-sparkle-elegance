@@ -246,8 +246,8 @@ async function handleChat({ request }: { request: Request }): Promise<Response> 
     const context = await buildTrustedContext(body.context?.searchTerm);
     const systemPrompt = buildSystemPrompt(context);
 
-    // Call Together AI
-    const response = await callTogetherAI(boundedMessages, systemPrompt);
+    // Call Lovable AI
+    const response = await callAiGateway(apiKey, boundedMessages, systemPrompt);
 
     return json({
       message: response,
