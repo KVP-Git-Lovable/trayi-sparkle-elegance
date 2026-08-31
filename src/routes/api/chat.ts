@@ -8,15 +8,20 @@
  * - Returns safe, sanitized responses
  */
 
-import { json, type RequestHandler } from '@tanstack/start';
-import { posSupabase } from '~/lib/pos-supabase';
-import { buildTrustedContext } from '~/lib/chat-context';
-import { cleanText } from '~/lib/text-clean';
+import { createFileRoute } from '@tanstack/react-router';
+import { buildTrustedContext } from '@/lib/chat-context';
+import { cleanText } from '@/lib/text-clean';
 
-// Environment variables (server-side only)
-const TOGETHER_AI_KEY = process.env.TOGETHER_AI_KEY;
-const TOGETHER_API_URL = 'https://api.together.xyz/inference';
-const TOGETHER_MODEL = 'meta-llama/Meta-Llama-3-8B-Instruct-Turbo';
+const json = (data: unknown, init?: ResponseInit) =>
+  new Response(JSON.stringify(data), {
+    ...init,
+    headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
+  });
+
+
+// Lovable AI Gateway (server-side only)
+const AI_GATEWAY_URL = 'https://ai.gateway.lovable.dev/v1/responses';
+const AI_MODEL = 'openai/gpt-5.6-sol';
 
 // Configuration
 const MAX_MESSAGE_LENGTH = 500;
@@ -101,30 +106,36 @@ function boundHistory(messages: ChatMessage[]): ChatMessage[] {
   return result;
 }
 
-// Call Together AI API
-async function callTogetherAI(
+type ResponsesOutput = {
+  output_text?: string;
+  output?: Array<{ content?: Array<{ type?: string; text?: string }> }>;
+};
+
+// Call Lovable AI Gateway (Responses API)
+async function callAiGateway(
+  apiKey: string,
   messages: ChatMessage[],
   systemPrompt: string
 ): Promise<string> {
   const payload = {
-    model: TOGETHER_MODEL,
-    messages: [
-      { role: 'system', content: systemPrompt },
-      ...messages,
-    ],
-    max_tokens: 512,
-    temperature: 0.7,
-    top_p: 0.9,
+    model: AI_MODEL,
+    instructions: systemPrompt,
+    input: messages.map((m) => ({
+      role: m.role,
+      content: [
+        { type: m.role === 'user' ? 'input_text' : 'output_text', text: m.content },
+      ],
+    })),
   };
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    const response = await fetch(TOGETHER_API_URL, {
+    const response = await fetch(AI_GATEWAY_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${TOGETHER_AI_KEY}`,
+        'Lovable-API-Key': apiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
@@ -132,12 +143,22 @@ async function callTogetherAI(
     });
 
     if (!response.ok) {
-      console.error(`Together AI error: ${response.status}`);
+      const detail = await response.text().catch(() => '');
+      console.error(`AI gateway error ${response.status}: ${detail}`);
+      if (response.status === 429) throw new Error('Too many requests. Please try again in a moment.');
+      if (response.status === 402) throw new Error('AI credits are exhausted. Please contact the store.');
       throw new Error('AI service error');
     }
 
-    const data = await response.json() as any;
-    const text = data?.output?.choices?.[0]?.text || '';
+    const data = (await response.json()) as ResponsesOutput;
+    const text =
+      data.output_text ||
+      (data.output ?? [])
+        .flatMap((item) => item.content ?? [])
+        .filter((c) => c.type === 'output_text' || typeof c.text === 'string')
+        .map((c) => c.text ?? '')
+        .join('')
+        .trim();
 
     if (!text) {
       throw new Error('Empty response from AI');
@@ -146,22 +167,24 @@ async function callTogetherAI(
     return cleanText(text).trim();
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
-      console.error('Together AI request timeout');
+      console.error('AI gateway request timeout');
       throw new Error('Request timeout');
     }
-    console.error('Together AI error:', error);
-    throw new Error('AI service unavailable');
+    console.error('AI gateway error:', error);
+    throw error instanceof Error ? error : new Error('AI service unavailable');
   } finally {
     clearTimeout(timeout);
   }
 }
 
 // Main handler
-export const POST: RequestHandler = async ({ request }) => {
+async function handleChat({ request }: { request: Request }): Promise<Response> {
+
   try {
-    // Check prerequisites
-    if (!TOGETHER_AI_KEY) {
-      console.error('TOGETHER_AI_KEY not configured');
+    // Check prerequisites (read env inside the handler)
+    const apiKey = process.env['LOVABLE_API_KEY'];
+    if (!apiKey) {
+      console.error('LOVABLE_API_KEY not configured');
       return json(
         { error: 'Service not configured' },
         { status: 503 }
@@ -224,8 +247,8 @@ export const POST: RequestHandler = async ({ request }) => {
     const context = await buildTrustedContext(body.context?.searchTerm);
     const systemPrompt = buildSystemPrompt(context);
 
-    // Call Together AI
-    const response = await callTogetherAI(boundedMessages, systemPrompt);
+    // Call Lovable AI
+    const response = await callAiGateway(apiKey, boundedMessages, systemPrompt);
 
     return json({
       message: response,
@@ -245,4 +268,13 @@ export const POST: RequestHandler = async ({ request }) => {
       { status: 500 }
     );
   }
-};
+}
+
+export const Route = createFileRoute('/api/chat')({
+  server: {
+    handlers: {
+      POST: handleChat,
+    },
+  },
+});
+
