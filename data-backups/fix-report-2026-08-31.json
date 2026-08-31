@@ -1,16 +1,1097 @@
 {
-  "timestamp": "2026-08-31T05:59:03.208Z",
-  "mode": "dry-run",
+  "timestamp": "2026-08-31T06:03:18.671Z",
+  "mode": "live",
   "total_earrings": 284,
   "expected": 216,
   "generated": 216,
   "validated": 216,
   "ai_generated": 216,
   "fallback_used": 0,
-  "updated": 0,
+  "updated": 216,
   "verified": 0,
-  "failed": 0,
-  "failures": [],
+  "failed": 216,
+  "failures": [
+    {
+      "handle": "der000411",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "sleek-heart-cut-halo-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "sun-rays-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "majestic-mirage-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "regal-resplendence-elegance-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "infinite-brilliance-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "seraphic-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "radiant-allure-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "dazzling-pearl-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "shimmering-opal-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "celestial-veil-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "lyanne-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "gabrielle-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "lite-luxe-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "phyllo-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "periwinkle-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "dora-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "celestial-serenity-diamond-halo-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "angel-classic-round-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "my-era-classic-round-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "swirl-clover-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "dazzle-tabs-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "the-queens-orb-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "crown-loop-diamond-drop-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "tiny-stars-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "tiered-diamond-drop-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "flora-gleam-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "diamond-starfire-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "twinkling-orbs-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "sparkling-opal-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "diamond-crescent-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "pure-radiance-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "arrow-edge-diamond-bali-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "divine-floreta-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "timeless-tresor-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "lush-diamond-glow-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "sleek-oval-cut-halo-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "enchante-elegance-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "der001349",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "der001345",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "der001354",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "luxe-lullaby-harmony-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "pear-solitaire-dual-halo-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "regal-reflection-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "diamond-dreamland-elegance-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "triangular-trellis-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "double-tri-curve-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "3d-sculpted-heart-throb-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "starling-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "marquise-round-cluster-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "contour-glam-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "strivelle-baguette-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "toi-et-moi-heart-emerald-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "heart-round-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "vertical-bar-pear-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "sequential-emerald-cut-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "modern-rhombus-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "wings-of-light-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "geometric-bloom-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "dainty-flower-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "oval-brilliance-diamond-halo-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "infinity-loop-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "twisted-sweetheart-diamond-drop-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "matching-cushion-solitaire-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "diva-drop-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "round-solitaire-bezel-drop-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "royal-fan-diamond-drop-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "triangular-pave-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "the-oracles-eye-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "mandala-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "turkish-blue-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "curve-current-diamond-drop-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "prism-trail-diamond-drop-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "lumi-stack-diamond-bali-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "regal-resplendence-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "ripple-light-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "stacklight-diamond-bali-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "light-tile-diamond-bali-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "stellar-circa-diamond-bali-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "petal-swirl-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "petal-trail-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "premium-crescent-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "all-day-pear-shine-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "radiant-contour-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "geometric-allure-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "curly-apex-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "floravex-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "stylish-bloog-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "marquise-swirl-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "linear-rail-floral-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "tulip-motif-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "v-shaped-pave-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "tangle-round-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "geometric-flower-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "floral-cluster-pave-set-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "ornava-link-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "encrusted-round-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "meshwork-round-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "tear-dazzle-round-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "curved-leaf-motif-diamond-stud-earrigngs",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "floral-cutwork-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "abstract-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "sculpted-leafy-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "curved-sphere-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "glamour-round-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "radiant-curves-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "radiant-rose-whirl-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "radial-cluster-round-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "organic-round-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "crystal-shimmer-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "opal-reflection-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "tranquil-diamond-dew-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "radiant-quad-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "duopear-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "dazzle-d-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "sparkling-edge-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "starlight-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "phobe-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "elliptical-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "alluring-vortex-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "dipped-in-luxe-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "gold-marvels-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "cosmic-circlet-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "swirl-on-diamond-dangler-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "spiral-muse-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "floral-dip-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "crimson-leaf-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "rhombus-aura-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "crystal-pull-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "the-v-drop-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "pop-up-sparkles-diamond-hoops",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "xoxo-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "entwined-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "the-pyramid-fall-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "pinwheel-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "concurrent-diamond-danglers",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "splendour-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "dainty-peas-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "lattice-teardrop-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "enlighten-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "striking-spike-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "the-quest-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "swirled-blob-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "lunar-droplet-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "diamond-rush-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "luxe-circlet-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "shield-drop-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "orbital-swirl-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "the-meridian-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "latif-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "cushion-curve-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "tri-flare-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "kite-flight-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "lace-wing-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "echo-drop-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "window-gem-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "spade-of-sparkle-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "marquise-quill-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "geometric-bloom-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "the-teardrop-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "starreign-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "fourfold-sparkle-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "rhombus-link-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "harmony-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "crimson-frost-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "beating-bright-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "lunar-drift-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "royal-layers-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "squared-one-diamond-bali-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "whisper-vine-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "classic-glowing-diamond-drop-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "dustlight-dots-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "twin-round-dimaond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "ideal-round-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "petite-prism-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "triform-spark-diamond-drop-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "shapeshift-diamond-drop-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "boxed-light-diamond-bali-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "double-beamed-diamond-bali-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "ripple-curve-diamond-drop-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "sparkling-hearts-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "butterfly-shine-diamond-drop-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "glow-dance-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "goldbloom-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "lit-facet-diamond-drop-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "linear-baguette-diamond-bali-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "streamlined-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "icy-baguette-diamond-bali-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "ruffled-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "lustre-drops-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "ornaflare-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "leaf-vine-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "tapered-curl-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "mini-sprig-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "gleam-block-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "silent-stars-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "arcline-diamond-bali-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "mini-starlights-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "cut-geometry-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "northern-stars-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "nova-bloom-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "nebula-swirl-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "the-alchemist-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "venetian-drop-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "trinkle-diamond-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "moon-drip-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "mirage-twist-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "botanic-blush-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "glowline-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "celeste-bloom-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "botanica-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "bloom-luxe-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "flying-wings-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "prism-rolls-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    },
+    {
+      "handle": "mini-memento-diamond-stud-earrings",
+      "stage": "verify",
+      "error": "row does not match new description"
+    }
+  ],
   "backup": "/dev-server/data-backups/earrings_backup_2026-08-31.json",
   "preview": "/dev-server/data-backups/fix-preview-2026-08-31.json"
 }
