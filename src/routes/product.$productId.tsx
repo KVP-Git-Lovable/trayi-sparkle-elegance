@@ -13,7 +13,8 @@ import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { useWishlist } from "@/lib/wishlist";
 import { usePriceVisibility } from "@/lib/price-visibility";
-import { ShieldCheck, Award, Truck, Store, Minus, Plus, Heart, Share2 } from "lucide-react";
+import { ShieldCheck, Award, Truck, Store, Minus, Plus, Heart, Share2, MessageCircle } from "lucide-react";
+import { useChatContext } from "@/lib/chat";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/product/$productId")({
@@ -146,6 +147,7 @@ function ProductPage() {
   };
 
   const { user } = useAuth();
+  const { sendPriceRequest } = useChatContext();
   const { has, toggle } = useWishlist();
   const saved = has(product.id);
   const [isWishlistLoading, setIsWishlistLoading] = useState(false);
@@ -355,6 +357,12 @@ function ProductPage() {
             </button>
             <button onClick={onShare} className="inline-flex items-center gap-2 hover:text-accent">
               <Share2 className="h-4 w-4" /> Share
+            </button>
+            <button
+              onClick={() => sendPriceRequest(product.id, product.name)}
+              className="inline-flex items-center gap-2 hover:text-accent"
+            >
+              <MessageCircle className="h-4 w-4" /> Ask for Price
             </button>
           </div>
 

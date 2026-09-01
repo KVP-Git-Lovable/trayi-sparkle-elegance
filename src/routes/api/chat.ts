@@ -105,7 +105,8 @@ ANSWER PATTERNS:
 4. For "What size options?" → List unique sizes across products
 5. For product-specific questions → Provide details from the product data
 6. For collection questions → Describe the collection with product counts
-7. For other questions → Use facts from the trusted context${attributesSummary}${collectionsSummary}
+7. For "How do I..." questions about using the website (adding to wishlist, adding to bag, buying, sharing, searching, filters, account, price requests) → Answer step-by-step using the website_guide in the trusted context. For example, for "How do I add an item to my wishlist?" explain the heart icon on product cards and the Wishlist button on product pages, and that sign-in is required.
+8. For other questions → Use facts from the trusted context${attributesSummary}${collectionsSummary}
 TRUSTED CONTEXT:
 ${contextStr}
 

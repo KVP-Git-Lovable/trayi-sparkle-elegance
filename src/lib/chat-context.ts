@@ -19,6 +19,7 @@ import {
   searchProductsByName,
 } from './catalog-index';
 import { analyzeSearchIntent, extractKeywords } from './search-intent';
+import { WEBSITE_GUIDE } from './website-guide';
 
 export interface TrustedContext {
   globalAttributes?: {
@@ -53,6 +54,7 @@ export interface TrustedContext {
     contact?: string;
     collections?: string[];
   };
+  website_guide?: Record<string, string>;
 }
 
 /**
@@ -247,6 +249,9 @@ async function getWebsiteInfo(): Promise<TrustedContext['website_info']> {
  */
 export async function buildTrustedContext(searchTerm?: string): Promise<TrustedContext> {
   const context: TrustedContext = {};
+
+  // Always include the website usage guide (static, verified how-to content)
+  context.website_guide = WEBSITE_GUIDE;
 
   try {
     // ALWAYS include global attributes - these are always relevant
