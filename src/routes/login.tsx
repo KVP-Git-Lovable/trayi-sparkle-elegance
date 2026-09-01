@@ -92,21 +92,11 @@ function LoginPage() {
         });
         if (error) throw error;
         if (data.session) {
+          // Email auto-confirmation is enabled: the account is active
+          // immediately and the user is signed in right away.
+          toast.success("Welcome to Trayi");
           navigate({ to: "/account" });
         } else {
-          // Deliver the verification email through Resend (edge function);
-          // Supabase's built-in auth email does not reach customers.
-          if (data.user) {
-            void supabase.functions
-              .invoke("send-verification-email", {
-                body: { userId: data.user.id, email },
-              })
-              .then(({ error: sendError }) => {
-                if (sendError) {
-                  console.error("Failed to send verification email:", sendError);
-                }
-              });
-          }
           setSent("confirm");
         }
       } else {
