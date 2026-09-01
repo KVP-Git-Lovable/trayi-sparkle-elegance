@@ -195,7 +195,7 @@ function CategoryPage() {
                 </div>
               ) : (
                 <div className="mt-8 grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
-                  {visible.map((p: Product) => <ProductCard key={p.id} product={p} />)}
+                  {visible.map((p: Product) => <ProductCard key={p.id} product={p} hideMetal />)}
                 </div>
               )}
             </div>

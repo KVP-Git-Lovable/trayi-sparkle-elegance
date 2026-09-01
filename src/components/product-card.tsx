@@ -7,7 +7,13 @@ import { useWishlist } from "@/lib/wishlist";
 import { useAuth } from "@/lib/auth";
 import { useState } from "react";
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({
+  product,
+  hideMetal = false,
+}: {
+  product: Product;
+  hideMetal?: boolean;
+}) {
   const { hidePrices } = usePriceVisibility();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -93,9 +99,17 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
       <div className="pt-4 text-center">
         <h3 className="font-display text-lg text-foreground">{product.name}</h3>
-        <p className="mt-1 text-xs text-muted-foreground tracking-wide">
-          {product.carats} · {product.metal}
-        </p>
+        {hideMetal ? (
+          product.carats ? (
+            <p className="mt-1 text-xs text-muted-foreground tracking-wide">
+              {product.carats}
+            </p>
+          ) : null
+        ) : (
+          <p className="mt-1 text-xs text-muted-foreground tracking-wide">
+            {product.carats} · {product.metal}
+          </p>
+        )}
         {!hidePrices && (
           <>
             <p className="mt-2 text-sm text-foreground/90">
