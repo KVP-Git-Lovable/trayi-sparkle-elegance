@@ -2,6 +2,7 @@ import { createContext, useContext, useCallback, useState, type ReactNode } from
 import { toast } from "sonner";
 import { sendChatMessage } from "./chat-api";
 import { supabase } from "@/integrations/supabase/client";
+import { posSupabase } from "@/lib/pos-supabase";
 import { useAuth } from "@/lib/auth";
 
 export type Message = {
@@ -111,6 +112,25 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           console.error("Failed to record price request:", error);
         }
       })();
+
+      // Signed-in requests also go to the POS (storehaven) so staff can
+      // follow up from Transactions > Leads & Enquiries > Price Requests.
+      if (user) {
+        void (async () => {
+          const { error } = await posSupabase.from("price_requests").insert({
+            product_handle: productHandle,
+            product_name: productName,
+            customer_name:
+              (user.user_metadata?.full_name as string | undefined) ?? null,
+            customer_email: user.email ?? null,
+            customer_phone:
+              (user.user_metadata?.phone as string | undefined) ?? null,
+          });
+          if (error) {
+            console.error("Failed to send price request to POS:", error);
+          }
+        })();
+      }
     },
     [user]
   );
