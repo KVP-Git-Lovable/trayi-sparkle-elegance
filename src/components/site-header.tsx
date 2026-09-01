@@ -34,7 +34,7 @@ export function SiteHeader() {
 
         <Link to="/" className="flex items-center gap-3 leading-none">
           <img src={headerLogo} alt="TRAYI" className="h-12 w-auto" style={{ mixBlendMode: 'multiply' }} />
-          <span className="font-wordmark text-4xl md:text-5xl tracking-[0.06em] text-foreground">
+          <span className="font-wordmark text-4xl md:text-5xl tracking-[0.045em] text-foreground/75">
             TRAYI
           </span>
         </Link>
