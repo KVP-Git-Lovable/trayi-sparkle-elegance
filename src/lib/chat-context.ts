@@ -269,6 +269,15 @@ export async function buildTrustedContext(searchTerm?: string): Promise<TrustedC
       sizes: context.globalAttributes.sizes.length,
     });
 
+    // ALWAYS include per-collection product counts — questions like
+    // "How many earrings do you have?" need them regardless of intent.
+    const allCollections = await getCollections();
+    context.collections = allCollections.map(c => ({
+      name: c.name,
+      productCount: c.count,
+      examples: c.examples,
+    }));
+
     // Detect search intent from query to add additional context
     if (searchTerm) {
       console.log('[Chat Context] Search term provided:', searchTerm);
@@ -277,14 +286,7 @@ export async function buildTrustedContext(searchTerm?: string): Promise<TrustedC
 
       switch (intent.type) {
         case 'collection':
-          // For collection queries, include collection info
-          const allCollections = await getCollections();
-          context.collections = allCollections.map(c => ({
-            name: c.name,
-            productCount: c.count,
-            examples: c.examples,
-          }));
-          console.log('[Chat Context] Added collection context');
+          // Collection info already included above
           break;
 
         case 'product':

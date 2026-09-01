@@ -227,10 +227,13 @@ async function buildCatalogIndex(): Promise<CatalogIndex> {
   try {
     console.log('[Catalog Index] Starting build...');
 
-    // Fetch all active products from POS database
+    // Fetch all active products from POS database.
+    // Only select real DB columns — diamondCt/metalOptions/purityOptions are
+    // computed client-side in remote-catalog.ts and do NOT exist in the table
+    // (selecting them makes PostgREST reject the whole query).
     const { data, error, count } = await posSupabase
       .from('catalog_products')
-      .select('id, title, description, product_type, options, variants, tags, base_price, display_price, diamondCt, metalOptions, purityOptions', { count: 'exact' })
+      .select('id, title, description, product_type, options, variants, tags, base_price, display_price', { count: 'exact' })
       .eq('status', 'active')
       .limit(1000);
 
