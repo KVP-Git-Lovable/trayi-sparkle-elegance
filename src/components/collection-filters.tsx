@@ -197,17 +197,6 @@ export function CollectionFilters({
         </Section>
       )}
 
-      {facets.size.length > 0 && (
-        <Section title="Size">
-          <OptionList
-            options={facets.size}
-            selected={filters.size}
-            onToggle={toggle("size")}
-            counts={counts("size", facets.size)}
-          />
-        </Section>
-      )}
-
       {facets.shopFor.length > 0 && (
         <Section title="Shop For">
           <OptionList
