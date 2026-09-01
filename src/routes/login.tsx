@@ -78,6 +78,10 @@ function LoginPage() {
         toast.success("Welcome back to Trayi");
         navigate({ to: "/account" });
       } else if (mode === "signup") {
+        if (password.length < 6) {
+          toast.error("Password must be at least 6 characters.");
+          return;
+        }
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
