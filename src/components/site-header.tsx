@@ -32,7 +32,7 @@ export function SiteHeader() {
           <SearchDialog />
         </div>
 
-        <Link to="/" className="flex items-center gap-3 leading-none">
+        <Link to="/" className="flex items-center gap-1 md:gap-3 leading-none mr-3 md:mr-0">
           <img src={headerLogo} alt="TRAYI" className="h-12 w-auto" style={{ mixBlendMode: 'multiply' }} />
           <span
             className="font-wordmark text-4xl md:text-5xl tracking-[0.045em] text-foreground/60 translate-y-[0.10em]"
