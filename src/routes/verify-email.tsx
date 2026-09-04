@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { supabase } from "@/integrations/supabase/client";
+import { seoHead } from "@/lib/seo";
 
 type VerifySearch = { token?: string };
 
@@ -10,13 +11,13 @@ export const Route = createFileRoute("/verify-email")({
   validateSearch: (search: Record<string, unknown>): VerifySearch => ({
     token: typeof search.token === "string" ? search.token : undefined,
   }),
-  head: () => ({
-    meta: [
-      { title: "Verify Your Email — Trayi Jewellery" },
-      { name: "description", content: "Confirm your email to activate your Trayi Jewellery account." },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
+  head: () =>
+    seoHead({
+      title: "Verify Your Email — Trayi Jewellery",
+      description: "Confirm your email to activate your Trayi Jewellery account.",
+      path: "/verify-email",
+      noindex: true,
+    }),
   component: VerifyEmailPage,
 });
 

@@ -8,14 +8,16 @@ import { usePriceVisibility } from "@/lib/price-visibility";
 import { Store, Truck, ShieldCheck, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { createOnlineOrder } from "@/lib/storehaven-api";
+import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/checkout")({
-  head: () => ({
-    meta: [
-      { title: "Checkout — Trayi Jewellery" },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
+  head: () =>
+    seoHead({
+      title: "Checkout — Trayi Jewellery",
+      description: "Complete your Trayi Jewellery order securely.",
+      path: "/checkout",
+      noindex: true,
+    }),
   component: CheckoutPage,
 });
 

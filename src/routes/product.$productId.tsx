@@ -4,7 +4,9 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { ProductGallery } from "@/components/product-gallery";
-import { formatINR, type Product } from "@/lib/catalog";
+import { categories, formatINR, type Product } from "@/lib/catalog";
+import { seoHead } from "@/lib/seo";
+import { BreadcrumbJsonLd, ProductJsonLd } from "@/components/seo-jsonld";
 import { applySchemeToPrice } from "@/lib/pos-schemes";
 import { resolveColorImage } from "@/lib/metal-image";
 
@@ -17,6 +19,15 @@ import { ShieldCheck, Award, Truck, Store, Minus, Plus, Heart, Share2, MessageCi
 import { useChatContext } from "@/lib/chat";
 import { toast } from "sonner";
 
+const FALLBACK_PRODUCT_DESCRIPTION =
+  "Certified lab grown diamond jewellery from Trayi Jewellers, Mangalore.";
+
+function productSnippet(description?: string): string {
+  const text = (description ?? "").trim();
+  if (!text) return FALLBACK_PRODUCT_DESCRIPTION;
+  return text.length > 150 ? `${text.slice(0, 150).trimEnd()}…` : text;
+}
+
 export const Route = createFileRoute("/product/$productId")({
   loader: async ({ params }) => {
     const product = await fetchProductByHandle(params.productId);
@@ -24,17 +35,22 @@ export const Route = createFileRoute("/product/$productId")({
     const related = await fetchRelated(product.category, product.id, 4);
     return { product, related };
   },
-  head: ({ loaderData }) => ({
-    meta: loaderData
-      ? [
-          { title: `${loaderData.product.name} — Trayi Jewellery` },
-          { name: "description", content: loaderData.product.description },
-          { property: "og:title", content: `${loaderData.product.name} — Trayi Jewellery` },
-          { property: "og:description", content: loaderData.product.description },
-          { property: "og:image", content: loaderData.product.image },
-        ]
-      : [{ title: "Product — Trayi Jewellery" }, { name: "robots", content: "noindex" }],
-  }),
+  head: ({ loaderData }) =>
+    loaderData
+      ? seoHead({
+          title: `${loaderData.product.name} — Lab Grown Diamonds, Mangalore | Trayi`,
+          description: productSnippet(loaderData.product.description),
+          path: `/product/${loaderData.product.id}`,
+          ...(/^https?:\/\//.test(loaderData.product.image)
+            ? { image: loaderData.product.image }
+            : {}),
+        })
+      : seoHead({
+          title: "Product — Trayi Jewellery",
+          description: FALLBACK_PRODUCT_DESCRIPTION,
+          path: "/collections",
+          noindex: true,
+        }),
   component: ProductPage,
   errorComponent: ({ error }) => (
     <div className="p-16 text-center text-sm text-muted-foreground">{error.message}</div>
@@ -190,9 +206,29 @@ function ProductPage() {
 
 
 
+  const categoryName =
+    categories.find((c) => c.slug === product.category)?.name ?? product.category;
+  const descriptionSnippet = productSnippet(product.description);
+
   return (
     <div className="min-h-screen">
       <SiteHeader />
+      <ProductJsonLd
+        name={product.name}
+        description={descriptionSnippet}
+        image={product.image}
+        path={`/product/${product.id}`}
+        price={price}
+        showPrice={!hidePrices}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", path: "/" },
+          { name: "Collections", path: "/collections" },
+          { name: categoryName, path: `/collections/${product.category}` },
+          { name: product.name, path: `/product/${product.id}` },
+        ]}
+      />
 
       {/* Breadcrumbs */}
       <div className="mx-auto max-w-7xl px-6 pt-8 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">

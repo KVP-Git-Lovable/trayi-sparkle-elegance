@@ -8,19 +8,16 @@ import { useWishlist } from "@/lib/wishlist";
 import { formatINR } from "@/lib/catalog";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
+import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_authenticated/account")({
-  head: () => ({
-    meta: [
-      { title: "My Account — Trayi Jewellery" },
-      { name: "description", content: "Manage your Trayi profile and view the pieces on your wishlist." },
-      { property: "og:title", content: "My Account — Trayi Jewellery" },
-      { property: "og:description", content: "Manage your Trayi profile and wishlist." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
+  head: () =>
+    seoHead({
+      title: "My Account — Trayi Jewellery",
+      description: "Manage your Trayi profile and view the pieces on your wishlist.",
+      path: "/account",
+      noindex: true,
+    }),
   component: AccountPage,
 });
 

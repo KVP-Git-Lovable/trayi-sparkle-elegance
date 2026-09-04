@@ -2,16 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { categories } from "@/lib/catalog";
+import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/collections/")({
-  head: () => ({
-    meta: [
-      { title: "Collections — Trayi Jewellery" },
-      { name: "description", content: "Explore Trayi's full range of LimeLight lab-grown diamond diamond and gold rings, earrings, pendants, necklaces, bracelets, tanmaniya and nose pins." },
-      { property: "og:title", content: "Collections — Trayi Jewellery" },
-      { property: "og:description", content: "Explore Trayi's full range of LimeLight lab-grown diamond jewellery." },
-    ],
-  }),
+  head: () =>
+    seoHead({
+      title: "Lab Grown Diamond Jewellery Collections — Trayi, Mangalore",
+      description: "Explore lab grown diamond rings, earrings, pendants, necklaces, bracelets and tanmaniya in Mangalore (Mangaluru). IGI-certified CVD diamonds, perfect for gifting.",
+      path: "/collections",
+    }),
   component: CollectionsIndex,
 });
 

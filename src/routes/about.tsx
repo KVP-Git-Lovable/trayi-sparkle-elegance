@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { seoHead } from "@/lib/seo";
 import photo1 from "@/about_photos/about-photo-1.jpeg";
 import photo2 from "@/about_photos/about-photo-2.jpeg";
 import photo3 from "@/about_photos/about-photo-3.jpeg";
@@ -10,14 +11,12 @@ import photo6 from "@/about_photos/about-photo-6.jpeg";
 import photo7 from "@/about_photos/about-photo-7.jpeg";
 
 export const Route = createFileRoute("/about")({
-  head: () => ({
-    meta: [
-      { title: "Our Story — Trayi Jewellery, Mangalore" },
-      { name: "description", content: "Trayi is Mangalore's exclusive boutique for LimeLight lab-grown diamonds — a house built on integrity, craft and conscience." },
-      { property: "og:title", content: "Our Story — Trayi Jewellery" },
-      { property: "og:description", content: "Mangalore's exclusive LimeLight lab-grown diamond boutique." },
-    ],
-  }),
+  head: () =>
+    seoHead({
+      title: "Our Story — Trayi Jewellers, Mangalore's Lab Grown Diamond Boutique",
+      description: "Trayi Jewellers is Mangalore's (Mangaluru's) exclusive LimeLight boutique for the best certified lab-grown diamonds — a modern boutique at Bharath Mall, Bejai.",
+      path: "/about",
+    }),
   component: AboutPage,
 });
 

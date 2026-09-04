@@ -1,19 +1,47 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { FaqJsonLd } from "@/components/seo-jsonld";
+import { seoHead } from "@/lib/seo";
 import educationImg from "@/assets/education-lab.jpg";
 import { Check, X } from "lucide-react";
 
+const FAQS = [
+  {
+    question: "Are CVD diamonds real diamonds?",
+    answer:
+      "Yes. CVD (Chemical Vapour Deposition) diamonds are 100% real diamonds — pure crystallised carbon, chemically, optically and physically identical to mined diamonds, and certified by IGI on the same 4Cs.",
+  },
+  {
+    question: "Where can I buy lab grown diamonds in Mangaluru?",
+    answer:
+      "Trayi Jewellers is Mangaluru's exclusive boutique for LimeLight lab grown diamonds, located on the 2nd Floor of Bharath Mall, Bejai, Mangalore. Visit us daily between 10 AM and 7 PM, or explore the collection online.",
+  },
+  {
+    question: "Which is the best diamond store in Mangalore for lab grown diamonds?",
+    answer:
+      "Trayi Jewellers at Bharath Mall, Bejai is Mangalore's dedicated lab grown diamond store — every piece uses IGI-certified CVD diamonds and comes with LimeLight's assured lifetime buyback.",
+  },
+  {
+    question: "Are lab grown diamonds certified?",
+    answer:
+      "Every Trayi diamond is independently graded by IGI on Cut, Colour, Clarity and Carat, with a laser-inscribed report number on the stone.",
+  },
+  {
+    question: "Are lab grown diamonds good for gifting?",
+    answer:
+      "Absolutely. Lab grown diamonds offer more carat and better clarity for the same budget, making them ideal for diamond gifting in Mangalore — anniversaries, weddings, birthdays or a quiet everyday gesture.",
+  },
+];
+
 export const Route = createFileRoute("/education")({
-  head: () => ({
-    meta: [
-      { title: "Lab-Grown Diamonds: The Complete Guide — Trayi Jewellery" },
-      { name: "description", content: "Understand lab-grown diamonds — how they're made, why they're real, and how they compare to moissanite, cubic zirconia and mined diamonds. Guide by Trayi, Mangalore." },
-      { property: "og:title", content: "The Lab-Grown Diamond Guide — Trayi Jewellery" },
-      { property: "og:description", content: "Real diamonds. Better origin. Everything you need to know about lab-grown diamonds." },
-      { property: "og:image", content: educationImg },
-    ],
-  }),
+  head: () =>
+    seoHead({
+      title: "Lab Grown & CVD Diamonds in Mangaluru — The Complete Guide | Trayi",
+      description:
+        "How CVD and HPHT lab grown diamonds are made, why they are real diamonds, and how they compare to moissanite and mined stones. A guide by Trayi Jewellers, Mangalore (Mangaluru).",
+      path: "/education",
+    }),
   component: EducationPage,
 });
 
@@ -45,13 +73,15 @@ function EducationPage() {
       {/* HOW GROWN */}
       <section className="mx-auto max-w-6xl px-6 py-16 grid md:grid-cols-2 gap-14 items-center">
         <div>
-          <span className="eyebrow">How It's Grown</span>
+          <span className="eyebrow">How It's Grown — CVD &amp; HPHT</span>
           <h2 className="mt-4 font-display text-4xl">From carbon to crystal, in weeks.</h2>
           <p className="mt-6 text-muted-foreground leading-relaxed">
             A tiny diamond seed is placed inside a chamber that recreates the
-            heat and pressure of the earth's mantle. Carbon atoms bond, layer
-            over layer, and grow the seed into a rough diamond — atom-identical
-            to one formed underground over a billion years.
+            heat and pressure of the earth's mantle — through CVD (Chemical
+            Vapour Deposition) or HPHT (High Pressure, High Temperature).
+            Carbon atoms bond, layer over layer, and grow the seed into a rough
+            diamond — atom-identical to one formed underground over a billion
+            years.
           </p>
           <p className="mt-4 text-muted-foreground leading-relaxed">
             The rough is then cut and polished by master artisans, and graded
@@ -172,6 +202,27 @@ function EducationPage() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="mx-auto max-w-3xl px-6 py-24">
+        <div className="text-center">
+          <span className="eyebrow">Frequently Asked</span>
+          <h2 className="mt-4 font-display text-4xl md:text-5xl">
+            Lab grown diamonds, answered.
+          </h2>
+        </div>
+        <ul className="mt-14 space-y-10">
+          {FAQS.map((f) => (
+            <li key={f.question} className="border-b border-border/60 pb-8">
+              <h3 className="font-display text-2xl">{f.question}</h3>
+              <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                {f.answer}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <FaqJsonLd faqs={FAQS} />
       <SiteFooter />
     </div>
   );

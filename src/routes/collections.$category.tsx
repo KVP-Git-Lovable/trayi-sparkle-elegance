@@ -8,6 +8,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { SlidersHorizontal } from "lucide-react";
 import { categories, type Product } from "@/lib/catalog";
 import { fetchProductsByCategory } from "@/lib/remote-catalog";
+import { seoHead } from "@/lib/seo";
+import { BreadcrumbJsonLd } from "@/components/seo-jsonld";
 import {
   applyFilters,
   buildFacets,
@@ -50,17 +52,19 @@ export const Route = createFileRoute("/collections/$category")({
     return { category, products };
   },
 
-  head: ({ loaderData }) => ({
-    meta: loaderData
-      ? [
-          { title: `${loaderData.category.name} — Trayi Jewellery` },
-          { name: "description", content: `${loaderData.category.tagline}. Certified LimeLight lab-grown diamond ${loaderData.category.name.toLowerCase()} at Trayi, Mangalore.` },
-          { property: "og:title", content: `${loaderData.category.name} — Trayi Jewellery` },
-          { property: "og:description", content: loaderData.category.tagline },
-          { property: "og:image", content: loaderData.category.image },
-        ]
-      : [{ title: "Collection — Trayi Jewellery" }, { name: "robots", content: "noindex" }],
-  }),
+  head: ({ loaderData }) =>
+    loaderData
+      ? seoHead({
+          title: `${loaderData.category.name} — Lab Grown Diamond Jewellery in Mangalore | Trayi`,
+          description: `${loaderData.category.tagline}. ${loaderData.category.name} set with certified lab grown diamonds in Mangalore (Mangaluru) at Trayi Jewellers.`,
+          path: `/collections/${loaderData.category.slug}`,
+        })
+      : seoHead({
+          title: "Collection — Trayi Jewellery",
+          description: "Lab grown diamond jewellery collections at Trayi Jewellers, Mangalore.",
+          path: "/collections",
+          noindex: true,
+        }),
   component: CategoryPage,
   errorComponent: ({ error }) => (
     <div className="p-16 text-center text-sm text-muted-foreground">{error.message}</div>
@@ -141,6 +145,13 @@ function CategoryPage() {
   return (
     <div className="min-h-screen">
       <SiteHeader />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", path: "/" },
+          { name: "Collections", path: "/collections" },
+          { name: category.name, path: `/collections/${category.slug}` },
+        ]}
+      />
       <section className="relative">
         <div className="aspect-[16/6] overflow-hidden">
           <img src={category.image} alt={category.name} className="h-full w-full object-cover" />

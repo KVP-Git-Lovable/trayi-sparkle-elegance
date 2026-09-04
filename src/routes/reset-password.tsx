@@ -4,19 +4,16 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/reset-password")({
-  head: () => ({
-    meta: [
-      { title: "Set a New Password — Trayi Jewellery" },
-      { name: "description", content: "Choose a new password for your Trayi Jewellery account." },
-      { property: "og:title", content: "Set a New Password — Trayi Jewellery" },
-      { property: "og:description", content: "Choose a new password for your Trayi account." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
+  head: () =>
+    seoHead({
+      title: "Set a New Password — Trayi Jewellery",
+      description: "Choose a new password for your Trayi Jewellery account.",
+      path: "/reset-password",
+      noindex: true,
+    }),
   component: ResetPasswordPage,
 });
 

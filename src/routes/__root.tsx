@@ -17,6 +17,7 @@ import { PriceVisibilityProvider } from "@/lib/price-visibility";
 import { FilterVisibilityProvider } from "@/lib/filter-visibility";
 import { ChatProvider } from "@/lib/chat";
 import { ChatWidget } from "@/components/chat-widget";
+import { JewelryStoreJsonLd } from "@/components/seo-jsonld";
 import { Toaster } from "sonner";
 
 function NotFoundComponent() {
@@ -93,10 +94,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Trayi Jewellery — LimeLight Lab-Grown Diamonds, Mangalore" },
       { name: "twitter:description", content: "Mangalore's exclusive LimeLight boutique. Certified lab-grown diamond rings, earrings, pendants, bracelets and bridal jewellery." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3db2bc1d-e453-4fec-a2cc-3bc8d4f490f6/id-preview-7dea256f--553cfca1-a491-4fa0-a006-a62e14126d48.lovable.app-1784808715227.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3db2bc1d-e453-4fec-a2cc-3bc8d4f490f6/id-preview-7dea256f--553cfca1-a491-4fa0-a006-a62e14126d48.lovable.app-1784808715227.png" },
+      { property: "og:image", content: "https://trayijewellers.in/og-image.jpg" },
+      { name: "twitter:image", content: "https://trayijewellers.in/og-image.jpg" },
+      { property: "og:url", content: "https://trayijewellers.in" },
+      { property: "og:site_name", content: "Trayi Jewellers" },
+      { property: "og:locale", content: "en_IN" },
     ],
     links: [
+      { rel: "canonical", href: "https://trayijewellers.in" },
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
 
@@ -113,7 +118,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en-IN">
       <head>
         <HeadContent />
       </head>
@@ -139,6 +144,7 @@ function RootComponent() {
                 <Outlet />
                 <Toaster position="bottom-right" theme="light" />
                 <ChatWidget />
+                <JewelryStoreJsonLd />
               </ChatProvider>
             </FilterVisibilityProvider>
           </PriceVisibilityProvider>

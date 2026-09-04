@@ -6,19 +6,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({
-    meta: [
-      { title: "Sign In — Trayi Jewellery" },
-      { name: "description", content: "Sign in or create your Trayi account to save favourites, track orders and access member events." },
-      { property: "og:title", content: "Sign In — Trayi Jewellery" },
-      { property: "og:description", content: "Access your Trayi account to save favourites and track orders." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
+  head: () =>
+    seoHead({
+      title: "Sign In — Trayi Jewellery",
+      description: "Sign in or create your Trayi account to save favourites, track orders and access member events.",
+      path: "/login",
+      noindex: true,
+    }),
   component: LoginPage,
 });
 

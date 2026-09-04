@@ -3,6 +3,7 @@ import { z } from "zod";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CheckCircle2, Store, Truck } from "lucide-react";
+import { seoHead } from "@/lib/seo";
 
 const searchSchema = z.object({
   order: z.string().default("TRXXXXXX"),
@@ -11,12 +12,13 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/order-confirmation")({
   validateSearch: (s) => searchSchema.parse(s),
-  head: () => ({
-    meta: [
-      { title: "Order Confirmed — Trayi Jewellery" },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
+  head: () =>
+    seoHead({
+      title: "Order Confirmed — Trayi Jewellery",
+      description: "Your Trayi Jewellery order has been confirmed.",
+      path: "/order-confirmation",
+      noindex: true,
+    }),
   component: Confirmation,
 });
 

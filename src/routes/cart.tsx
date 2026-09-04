@@ -5,14 +5,16 @@ import { ShoppingBag, Minus, Plus, X, Truck, Store } from "lucide-react";
 import { useCart, itemProduct } from "@/lib/cart";
 import { formatINR } from "@/lib/catalog";
 import { usePriceVisibility } from "@/lib/price-visibility";
+import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/cart")({
-  head: () => ({
-    meta: [
-      { title: "Your Bag — Trayi Jewellery" },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
+  head: () =>
+    seoHead({
+      title: "Your Bag — Trayi Jewellery",
+      description: "Review the pieces in your Trayi Jewellery shopping bag.",
+      path: "/cart",
+      noindex: true,
+    }),
   component: CartPage,
 });
 

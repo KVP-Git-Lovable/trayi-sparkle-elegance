@@ -8,7 +8,7 @@ Use video and content from our Instagram - https://www.instagram.com/trayijewell
 
 This project was built with [Lovable](https://lovable.dev).
 
-**Live app**: https://trayi-sparkle-elegance.lovable.app
+**Live app**: https://trayijewellers.in
 
 ## Build with Lovable
 

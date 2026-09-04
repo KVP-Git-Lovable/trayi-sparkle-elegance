@@ -6,16 +6,15 @@ import { useState } from "react";
 import { toast } from "sonner";
 import entranceImg from "@/assets/trayi-entrance.png";
 import { submitAppointmentRequest } from "@/lib/appointment-api";
+import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({
-    meta: [
-      { title: "Visit Us — Trayi Jewellery, Mangalore" },
-      { name: "description", content: "Visit Trayi's LimeLight lab-grown diamond boutique in Mangalore. Book a private appointment for bridal and fine jewellery consultations." },
-      { property: "og:title", content: "Visit Trayi Jewellery, Mangalore" },
-      { property: "og:description", content: "Book a private appointment at our Mangalore boutique." },
-    ],
-  }),
+  head: () =>
+    seoHead({
+      title: "Visit Trayi — Diamond Store in Bejai, Mangalore (Bharath Mall)",
+      description: "Visit the best diamond shop in Mangalore: Trayi Jewellers, 2nd Floor, Bharath Mall, Bejai, Mangaluru. Lab grown CVD diamond jewellery, bridal sets and diamond gifting. Call +91 89717 83030.",
+      path: "/contact",
+    }),
   component: ContactPage,
 });
 

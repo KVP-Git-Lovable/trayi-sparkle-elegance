@@ -6,16 +6,17 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { categories, products } from "@/lib/catalog";
+import { seoHead } from "@/lib/seo";
 import { Sparkles, ShieldCheck, Leaf, Award, Instagram } from "lucide-react";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Trayi Jewellery — LimeLight Lab-Grown Diamonds, Mangalore" },
-      { name: "description", content: "Mangalore's exclusive LimeLight boutique. Certified lab-grown diamond rings, earrings, pendants, bracelets and bridal jewellery." },
-      { property: "og:image", content: heroImg },
-    ],
-  }),
+  head: () =>
+    seoHead({
+      title: "Trayi Jewellers — Best Diamond Store in Mangalore | Lab Grown Diamonds",
+      description:
+        "Trayi Jewellers is the best diamond store in Mangalore (Mangaluru) for IGI-certified lab grown CVD diamonds — rings, earrings, pendants, necklaces, bracelets, bridal jewellery and diamond gifting.",
+      path: "/",
+    }),
   component: HomePage,
 });
 
@@ -35,9 +36,10 @@ function HomePage() {
               <em className="italic text-accent">grown with intention.</em>
             </h1>
             <p className="mt-8 max-w-md text-base text-muted-foreground leading-relaxed">
-              Trayi is Mangalore's exclusive home for LimeLight lab-grown diamonds —
-              chemically, optically and physically identical to mined diamonds,
-              certified by IGI, and made without harm to the earth.
+              Trayi is Mangalore's (Mangaluru's) exclusive home for LimeLight
+              lab-grown CVD diamonds — chemically, optically and physically
+              identical to mined diamonds, certified by IGI, and made without
+              harm to the earth.
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
               <Link
@@ -213,6 +215,37 @@ function HomePage() {
         >
           <Instagram className="h-4 w-4" /> Follow on Instagram
         </a>
+      </section>
+
+      {/* LOCAL SEO */}
+      <section className="mx-auto max-w-4xl px-6 py-16 text-center">
+        <span className="eyebrow">Trayi Jewellers · Bejai, Mangalore</span>
+        <h2 className="mt-4 font-display text-3xl md:text-4xl text-foreground">
+          Mangalore's destination for lab-grown diamonds
+        </h2>
+        <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
+          Looking for the best diamond store in Mangalore? Trayi Jewellers, at
+          Bharath Mall in Bejai, is Mangaluru's exclusive boutique for LimeLight
+          lab grown diamonds. Every piece is crafted with IGI-certified CVD
+          diamonds — from engagement rings and everyday earrings to tanmaniya
+          and bridal sets — and our collection makes diamond gifting in
+          Mangalore effortless, for anniversaries, weddings and every quiet
+          milestone in between.
+        </p>
+        <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <Link
+            to="/collections"
+            className="inline-flex items-center justify-center border border-foreground px-6 py-3 text-[11px] uppercase tracking-[0.28em] text-foreground hover:bg-foreground hover:text-background transition-colors"
+          >
+            Explore the Collections
+          </Link>
+          <Link
+            to="/education"
+            className="inline-flex items-center justify-center border border-border px-6 py-3 text-[11px] uppercase tracking-[0.28em] text-muted-foreground hover:text-accent transition-colors"
+          >
+            About CVD Diamonds
+          </Link>
+        </div>
       </section>
 
       <SiteFooter />
