@@ -53,6 +53,11 @@ export function seoHead({
       { name: "twitter:description", content: description },
       { name: "twitter:image", content: image },
     ],
-    links: [{ rel: "canonical", href: url }],
+    links: [
+      { rel: "canonical", href: url },
+      // Single-language site: self-referential hreflang
+      { rel: "alternate", hrefLang: "en-IN", href: url },
+      { rel: "alternate", hrefLang: "x-default", href: url },
+    ],
   };
 }

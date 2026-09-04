@@ -15,7 +15,7 @@ import nosePinImg from "@/assets/cat-nose-pins.jpg";
 import heroImg from "@/assets/hero-main.jpg";
 import bannerImg from "@/assets/collection-banner.jpg";
 import educationImg from "@/assets/education-lab.jpg";
-import necklaceImg from "@/assets/image-1786103498000.png";
+import necklaceImg from "@/assets/cat-necklaces.jpg";
 
 export type Category = {
   slug: string;

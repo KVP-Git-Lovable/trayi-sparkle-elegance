@@ -57,7 +57,7 @@ function HomePage() {
             </div>
           </div>
           <div className="order-1 md:order-2 relative overflow-hidden">
-            <img src={heroImg} alt="Lab-grown diamond ring and bracelet" width={1600} height={1200} className="h-full w-full object-cover" />
+            <img src={heroImg} alt="Lab-grown diamond ring and bracelet" width={1600} height={1200} fetchPriority="high" className="h-full w-full object-cover" />
           </div>
         </div>
       </section>
@@ -231,6 +231,25 @@ function HomePage() {
           everyday earrings to tanmaniya and bridal sets — and our collection
           makes diamond gifting in Mangalore effortless, for anniversaries,
           weddings and every quiet milestone in between.
+        </p>
+        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+          Our collections span solitaire and cluster rings, studs and drop
+          earrings, pendants, necklaces, bracelets, mangalsutra and tanmaniya —
+          each set with lab grown diamonds graded independently by IGI on Cut,
+          Colour, Clarity and Carat, with the report number laser-inscribed on
+          the stone. Because a CVD diamond offers thirty to forty percent more
+          carat for the same investment as a mined stone, you choose bigger,
+          brighter and better — and every purchase is protected by LimeLight's
+          assured lifetime buyback.
+        </p>
+        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+          Visit us on the second floor of Bharath Mall, near Jayalakshmi Silks
+          in Bejai — open every day from 10 AM to 7 PM. Our team will walk you
+          through the 4Cs, help you compare purities and metal colours in Rose,
+          Yellow and White Gold, and gift-wrap your chosen piece beautifully.
+          Prefer to browse first? Explore the full collection online, save your
+          favourites to a wishlist, or ask our AI assistant anything — from
+          collection counts to how lab grown diamonds are made.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-4">
           <Link
