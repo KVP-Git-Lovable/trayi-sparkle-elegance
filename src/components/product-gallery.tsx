@@ -114,7 +114,7 @@ export function ProductGallery({ images, alt, fallbackSrc }: Props) {
             aria-label={`View image ${i + 1}`}
             aria-current={i === index}
           >
-            <img src={g} alt="" className="h-full w-full object-cover" />
+            <img src={g} alt={`${alt} — thumbnail ${i + 1}`} className="h-full w-full object-cover" />
           </button>
         ))}
       </div>

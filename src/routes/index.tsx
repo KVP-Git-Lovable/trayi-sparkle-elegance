@@ -108,7 +108,7 @@ function HomePage() {
       {/* EDITORIAL BANNER */}
       <section className="relative">
         <div className="relative min-h-[60vh] overflow-hidden">
-          <img src={bannerImg} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <img src={bannerImg} alt="Lab grown diamond jewellery collection at Trayi Jewellers, Mangalore" className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/60 to-transparent" />
           <div className="relative mx-auto max-w-7xl px-6 py-24 md:py-32">
             <div className="max-w-lg">
@@ -201,7 +201,7 @@ function HomePage() {
               rel="noopener noreferrer"
               className="group relative aspect-square overflow-hidden bg-secondary/40"
             >
-              <img src={img} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              <img src={img} alt={`Trayi Jewellers lab grown diamond jewellery on Instagram ${i + 1}`} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 flex items-center justify-center bg-foreground/0 opacity-0 transition-all duration-500 group-hover:bg-foreground/40 group-hover:opacity-100">
                 <Instagram className="h-6 w-6 text-background" />
               </div>
@@ -226,11 +226,11 @@ function HomePage() {
         <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
           Looking for the best diamond store in Mangalore? Trayi Jewellers, at
           Bharath Mall in Bejai, is Mangaluru's exclusive boutique for LimeLight
-          lab grown diamonds. Every piece is crafted with IGI-certified CVD
-          diamonds — from engagement rings and everyday earrings to tanmaniya
-          and bridal sets — and our collection makes diamond gifting in
-          Mangalore effortless, for anniversaries, weddings and every quiet
-          milestone in between.
+          lab grown diamonds — brilliance grown with intention. Every piece is
+          crafted with IGI-certified CVD diamonds — from engagement rings and
+          everyday earrings to tanmaniya and bridal sets — and our collection
+          makes diamond gifting in Mangalore effortless, for anniversaries,
+          weddings and every quiet milestone in between.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-4">
           <Link
